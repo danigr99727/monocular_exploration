@@ -2,3 +2,6 @@
 [submodule "flame_ros"]
 	path = flame_ros
 	url = https://github.com/danigr99727/flame_ros
+[submodule "fiesta"]
+	path = fiesta
+	url = https://github.com/danigr99727/fiesta
