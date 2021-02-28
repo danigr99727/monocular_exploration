@@ -1,7 +1,4 @@
 
-[submodule "flame"]
-	path = flame
-	url = https://github.com/danigr99727/flame_ros
 [submodule "flame_ros"]
 	path = flame_ros
 	url = https://github.com/danigr99727/flame_ros
