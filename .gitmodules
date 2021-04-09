@@ -6,3 +6,7 @@
 [submodule "FUEL"]
 	path = FUEL
 	url = https://github.com/danigr99727/FUEL
+
+[submodule "tdnet_nyud"]
+	path = tdnet_nyud
+	url = https://github.com/danigr99727/tdnet_nyud
