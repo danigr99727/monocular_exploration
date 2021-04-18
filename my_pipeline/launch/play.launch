@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="vocabularty_path" default="$(find orb_slam2_cuda)/Vocabulary/ORBvoc.txt" />
+    <arg name="camera_setting_path" default="$(find my_pipeline)/calibration/TUM1_rect.yaml" />
+    <arg name="bUseViewer" default="true" />
+    <arg name="bEnablePublishROSTopic" default="true" />
+
+
+    <arg name="cam_name" default="s20cam_wide" />
+
+    <node pkg="rosbag" type="play" name="player" output="screen" args="--clock -l -r 0.1 /root/Camera2.bag " launch-prefix="bash -c 'sleep 10; $0 $@' "/>
+
+
+    <node name="orb_slam2_cuda" pkg="orb_slam2_cuda" type="Mono" output="screen"
+    	args="$(arg vocabularty_path) $(arg camera_setting_path) $(arg bUseViewer) $(arg bEnablePublishROSTopic)">
+    	<remap from="/camera/image_raw" to="/$(arg cam_name)/image_rect"/>
+  	</node>
+
+    <!-- from flame nodelet launch -->
+    <arg name="keyframes" default="keyframes" />
+
+    <arg name="namespace" default="flame" />
+    <arg name="manager" default="manager" />
+    <arg name="standalone" default="true" />
+    <arg name="output_dest" default="screen" />
+
+    <arg name="load_params" default="true" />
+    <arg name="param_file" default="flame_nodelet_s20.yaml" />
+
+    <arg name="bag_data" default="false" />
+
+     <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="body_to_camera"
+            args="0.0 0.0 0.0 0 0 0 0 body $(arg cam_name)" >
+      </node> -->
+
+
+    <group ns="$(arg namespace)" >
+
+
+      <arg name="world_frame_id" default="world" />
+      <arg name="camera_world_frame_id" default="camera_world" />
+          <node pkg="tf2_ros" type="static_transform_publisher" name="camera_world_to_world"
+               args="0.0 0.0 0.0 0.5 -0.5 0.5 -0.5 $(arg world_frame_id) $(arg camera_world_frame_id)" >
+          </node>
+
+
+        <!-- Launch the nodelet manager. -->
+        <node if="$(arg standalone)"
+              pkg="nodelet" type="nodelet" name="$(arg manager)"
+              args="manager" output="$(arg output_dest)" >
+        </node>
+
+        <!-- Launch the nodelet.. -->
+        <node pkg="nodelet" type="nodelet" name="flame_nodelet"
+              args="load flame_ros/FlameNodelet $(arg manager)"
+              output="$(arg output_dest)" launch-prefix="bash -c 'sleep 10; $0 $@' ">
+          <rosparam command="load" if="$(arg load_params)" file="$(find my_pipeline)/cfg/$(arg param_file)"/>
+          <remap from="/camera/rgb/image_rect" to="/$(arg cam_name)/image_rect" />
+          <remap from="/camera/rgb/camera_info" to="/$(arg cam_name)/camera_info" />
+          <remap from="keyframes" to="$(arg keyframes)" />
+        </node>
+
+    </group>
+
+    <node name="rvizfiestavisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find my_pipeline)/cfg/flame.rviz" />
+
+
+</launch>

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>third_party</name>
+    <version>0.0.0</version>
+    <description>TODO</description>
+
+    <maintainer email="danigr.99727@gmail.com">Daniel Gallego Rubio</maintainer>
+
+    <license>TODO</license>
+    <url type="website">TODO</url>
+
+    <buildtool_depend>catkin</buildtool_depend>
+
+
+
+</package>

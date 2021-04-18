@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="cam_name" default="camera/rgb" />
+    <arg name="depth_cam_name" default="camera/depth" />
+
+
+    <node pkg="rosbag" type="play" name="player" output="screen" args="--clock -r 0.5 /root/rgbd_dataset_freiburg3_structure_texture_near.bag" launch-prefix="bash -c 'sleep 5; $0 $@' ">
+    <remap from="/$(arg cam_name)/image_color" to="/$(arg cam_name)/image_raw"/>
+        <remap from="/$(arg depth_cam_name)/image" to="/$(arg depth_cam_name)/image_raw"/>
+    </node>
+
+  <!-- Provide rectification -->
+  <node pkg="image_proc" type="image_proc" name="creative_image_proc"
+        ns="$(arg cam_name)" >
+  </node>
+
+ <!-- <node pkg="image_proc" type="image_proc" name="depth_creative_image_proc"
+        ns="$(arg depth_cam_name)" >
+  </node> -->
+
+ <!-- tf_converter -->
+<node pkg="my_pipeline" type="tum_tf_converter" name="tum_tf_converter" />
+ <!-- Record -->
+
+    <node pkg="rosbag" type="record" name="rosbag_record_cam"
+           args="record -o /$(arg cam_name)/image_raw /$(arg cam_name)/image_rect
+           /$(arg cam_name)/camera_info
+           /transform_rgb_frame
+-O TUM_recording.bag"
+
+        />
+
+
+</launch>

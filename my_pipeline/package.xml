@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>my_pipeline</name>
+    <version>0.0.0</version>
+    <description>TODO</description>
+
+    <maintainer email="danigr.99727@gmail.com">Daniel Gallego Rubio</maintainer>
+
+    <license>TODO</license>
+    <url type="website">TODO</url>
+
+    <buildtool_depend>catkin</buildtool_depend>
+
+    <build_depend>orb_slam2_cuda</build_depend>
+    <build_depend>flame_ros</build_depend>
+    <build_depend>plan_env</build_depend>
+
+</package>
