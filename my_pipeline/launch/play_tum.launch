@@ -8,7 +8,7 @@
 
     <arg name="cam_name" default="openni_camera" />
 
-    <node pkg="rosbag" type="play" name="player" output="screen" args="--clock -l -r 1 /root/TUM_texture_recording.bag " launch-prefix="bash -c 'sleep 10; $0 $@' "/>
+    <node pkg="rosbag" type="play" name="player" output="screen" args="--clock -l -r 1 /root/TUM_recording_pioneer.bag " launch-prefix="bash -c 'sleep 10; $0 $@' "/>
 
 
    <!-- <node name="orb_slam2_cuda" pkg="orb_slam2_cuda" type="Mono" output="screen"
@@ -127,7 +127,7 @@
         <param name="vis_upper_bound" value="+10"/>
 
         <!-- subsribe source -->
-        <remap from="~depth" to="/flame/depth_registered/image_rect"/>
+        <remap from="~depth" to="/camera/depth_registered/image_rect"/>
         <remap from="~transform" to="/transform_rgb_frame"/>
     </node>
 
