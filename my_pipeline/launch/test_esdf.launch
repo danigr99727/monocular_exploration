@@ -5,7 +5,7 @@
       <arg name="bEnablePublishROSTopic" default="true" />
       <arg name="cam_name" default="s20cam_wide" />
 
-      <node pkg="rosbag" type="play" name="player" output="screen" args="--clock -l -r 0.05 /root/Camera2.bag " launch-prefix="bash -c 'sleep 10; $0 $@' "/>
+      <node pkg="rosbag" type="play" name="player" output="screen" args="--clock -l -r 0.05 /root/TUM_cabinet_recording.bag " launch-prefix="bash -c 'sleep 10; $0 $@' "/>
 
 
       <node name="orb_slam2_cuda" pkg="orb_slam2_cuda" type="Mono" output="screen"
