@@ -8,12 +8,13 @@
 
     <arg name="cam_name" default="openni_camera" />
 
-    <node pkg="rosbag" type="play" name="player" output="screen" args="--clock -r 0.1 /root/TUM_cabinet_recording.bag " launch-prefix="bash -c 'sleep 7; $0 $@' "/>
+    <node pkg="rosbag" type="play" name="player" output="screen" args="--clock -r 0.1 /root/TUM_office_recording.bag " launch-prefix="bash -c 'sleep 7; $0 $@' "/>
 
 
    <!-- <node name="orb_slam2_cuda" pkg="orb_slam2_cuda" type="Mono" output="screen"
     	args="$(arg vocabularty_path) $(arg camera_setting_path) $(arg bUseViewer) $(arg bEnablePublishROSTopic)">
     	<remap from="/camera/image_raw" to="/camera/rgb/image_rect"/>
+    	<remap from="/transform" to="/transform_rgb_frame"/>
   	</node> -->
 
     <!-- from flame nodelet launch -->
@@ -56,7 +57,9 @@
               args="load flame_ros/FlameNodelet $(arg manager)"
               output="$(arg output_dest)" launch-prefix="bash -c 'sleep 7; $0 $@' ">
           <rosparam command="load" if="$(arg load_params)" file="$(find my_pipeline)/cfg/$(arg param_file)"/>
-          <remap from="image" to="/camera/rgb/image_color" />
+          <remap from="/image" to="/camera/rgb/image_rect" />
+         <remap from="/info" to="/camera/rgb/camera_info" />
+          <remap from="/transform" to="/orb_slam2/transform"/>
           <remap from="keyframes" to="$(arg keyframes)" />
         </node>
 

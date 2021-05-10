@@ -18,7 +18,7 @@ SlamData::SlamData(ORB_SLAM2::System* pSLAM, ros::NodeHandle *nodeHandler, bool 
     tf::Quaternion q(0,0,0,1);
     last_transform.setRotation(q);
 
-    tf_pub = (*nodeHandler).advertise<geometry_msgs::TransformStamped>("/transform_rgb_frame", 1000);
+    tf_pub = (*nodeHandler).advertise<geometry_msgs::TransformStamped>("/transform", 1000);
     pose_pub = (*nodeHandler).advertise<geometry_msgs::PoseStamped>("/posestamped_s20", 1000);
     pose_inc_pub = (*nodeHandler).advertise<geometry_msgs::PoseWithCovarianceStamped>("incremental_pose_cov", 1000);
  

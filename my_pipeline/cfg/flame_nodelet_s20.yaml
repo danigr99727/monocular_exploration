@@ -9,10 +9,10 @@ input:
   resize_factor: 1 # Downsample image width/height by this factor.
 
 output:
-  quiet: false # Turn off terminal output.
+  quiet: true # Turn off terminal output.
   mesh: true # Publish mesh as pcl_msgs/PolygonMesh.
   idepthmap: false # Publish idepthmap as sensor_msgs/Image.
-  depthmap: false # Publish depthmap as sensor_msgs/Image.
+  depthmap: true # Publish depthmap as sensor_msgs/Image.
   cloud: false # Publish pointcloud sensor_msgs/PointCloud2. Prefer mesh or depthmap (in that order).
   features: false # Publish raw features points as sensors_msgs/Image.
   stats: true # Publish statistics message.
@@ -66,9 +66,9 @@ threading:
 features:
   do_letterbox: False # Process only middle third of image.
   detection:
-    min_grad_mag: 5.0 # Minimum gradient magntiude.
+    min_grad_mag: 2.0 # Minimum gradient magntiude.
     min_error: 100 # Minimum photo error.
-    win_size: 16 # Detection grid resolution (win_size x win_size).
+    win_size: 9 # Detection grid resolution (win_size x win_size).
   tracking:
     win_size: 5 # Feature tracking window size. If not using LK, must be odd.
     max_dropouts: 5 # Max number of missed detections before feature is killed.

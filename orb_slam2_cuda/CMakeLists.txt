@@ -34,7 +34,7 @@ else()
    message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
-LIST(APPEND CMAKE_MODULE_PATH /root/ORB_SLAM2_CUDA/cmake_modules)
+LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../third_party/ORB_SLAM2_CUDA/cmake_modules)
 
 find_package(OpenCV 4.2.0 REQUIRED PATHS "/root/opencv-4.2.0/opencv-4.2.0/install")
 find_package(Eigen3 3.1.0 REQUIRED)
@@ -45,19 +45,19 @@ find_package(CUDA REQUIRED)
 find_package( PCL REQUIRED )
 include_directories(  )
 link_directories(${PCL_LIBRARY_DIRS}
-        /root/ORB_SLAM2_CUDA/Thirdparty/DBoW2/lib/
-        /root/ORB_SLAM2_CUDA/Thirdparty/g2o/lib/
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../third_party/ORB_SLAM2_CUDA/Thirdparty/DBoW2/lib/
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../third_party/ORB_SLAM2_CUDA/Thirdparty/g2o/lib/
         )
 add_definitions(${PCL_DEFINITIONS})
 
 include_directories(
         ${catkin_INCLUDE_DIRS}  ${PCL_INCLUDE_DIRS}
         ${PROJECT_SOURCE_DIR}
-${PROJECT_SOURCE_DIR}/lib
-/root/ORB_SLAM2_CUDA/
-/root/ORB_SLAM2_CUDA/include
-${Pangolin_INCLUDE_DIRS}
-${CUDA_INCLUDE_DIRS}
+   `    ${PROJECT_SOURCE_DIR}/lib
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../third_party/ORB_SLAM2_CUDA/
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../third_party/ORB_SLAM2_CUDA/include
+        ${Pangolin_INCLUDE_DIRS}
+        ${CUDA_INCLUDE_DIRS}
 )
 
 set(LIBS
@@ -66,9 +66,7 @@ ${OpenCV_LIBS}
 ${EIGEN3_LIBS}
 ${Pangolin_LIBRARIES}
 ${PCL_LIBRARIES}
-/root/ORB_SLAM2_CUDA/lib/libORB_SLAM2_CUDA.so
-#/root/ORB_SLAM2_CUDA/Thirdparty/g2o/lib/libg2o.so
-#/root/ORB_SLAM2_CUDA/Thirdparty/DBoW2/lib/libDBoW2.so
+${CMAKE_CURRENT_SOURCE_DIR}/../../third_party/ORB_SLAM2_CUDA/lib/libORB_SLAM2_CUDA.so
 )
 
 # Node for monocular camera

@@ -17,6 +17,7 @@ output:
   features: false # Publish raw features points as sensors_msgs/Image.
   stats: true # Publish statistics message.
 
+
   # Integrate load measurements over this many frames before reporting. Timing
   # resolution of /proc is only a Jiffy (usually 0.01 sec), so querying faster
   # than this is not meaningful.
@@ -66,7 +67,7 @@ threading:
 features:
   do_letterbox: False # Process only middle third of image.
   detection:
-    min_grad_mag: 5.0 # Minimum gradient magntiude.
+    min_grad_mag: 4.0 # Minimum gradient magntiude.
     min_error: 100 # Minimum photo error.
     win_size: 16 # Detection grid resolution (win_size x win_size).
   tracking:
