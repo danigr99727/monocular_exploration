@@ -26,8 +26,3 @@ include_directories(
 
 link_libraries(
         ${catkin_LIBRARIES})
-
-add_executable(tum_tf_converter
-        src/tum_tf_converter.cpp)
-target_link_libraries(tum_tf_converter
-        ${catkin_LIBRARIES})

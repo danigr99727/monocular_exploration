@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
         std_msgs
         nav_msgs
         visualization_msgs
+        nodelet
         tf
         cv_bridge_4
         )
@@ -72,12 +73,15 @@ ${CMAKE_CURRENT_SOURCE_DIR}/../../third_party/ORB_SLAM2_CUDA/lib/libORB_SLAM2_CU
 # Node for monocular camera
 add_executable(Mono
         lib/orb_slam_wrapper.cc
-src/ros_mono.cc
+        src/orb_slam_mono_node.cc
 )
 
 target_link_libraries(Mono
 ${LIBS}
 )
+
+add_library(orb_slam_nodelet src/orb_slam_mono_nodelet.cc)
+target_link_libraries(orb_slam_nodelet  ${catkin_LIBRARIES})
 
 # Node for stereo camera
 #add_executable(Stereo
