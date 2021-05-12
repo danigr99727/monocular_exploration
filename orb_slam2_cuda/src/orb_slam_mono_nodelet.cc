@@ -30,7 +30,7 @@
 #include <Converter.h>
 #include <cv_bridge/cv_bridge.h>
 
-#include<opencv2/core/core.hpp>
+#include <opencv2/core/core.hpp>
 
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 
@@ -53,17 +53,21 @@ public:
         bEnablePublishROSTopic = true;
 
         // Create SLAM system. It initializes all system threads and gets ready to process frames.
-        ORB_SLAM2::System SLAM(argv[1],argv[2],ORB_SLAM2::System::MONOCULAR, bUseViewer);
-        ORB_SLAM2::SlamData SLAMDATA(&SLAM, &nh, bEnablePublishROSTopic);
-        ORB_SLAM2::ImageGrabber igb(&SLAM, &SLAMDATA, &nh);
+        SLAM = std::unique_ptr<ORB_SLAM2::System>(new ORB_SLAM2::System(argv[1],argv[2],ORB_SLAM2::System::MONOCULAR, bUseViewer));
+        SLAMDATA = std::unique_ptr<ORB_SLAM2::SlamData>(new ORB_SLAM2::SlamData(SLAM.get(), &nh, bEnablePublishROSTopic));
+        igb = std::unique_ptr<ORB_SLAM2::ImageGrabber>(new ORB_SLAM2::ImageGrabber(SLAM.get(), SLAMDATA.get(), &nh));
     }
 
     virtual ~ORBSLAMNodelet() {
         // Stop all threads
-        SLAM.Shutdown();
-        SLAM.SaveKeyFrameTrajectoryTUM(KEYFRAME_TRAJECTORY_TUM_SAVE_FILE_DIR);
+        SLAM->Shutdown();
+        SLAM->SaveKeyFrameTrajectoryTUM(KEYFRAME_TRAJECTORY_TUM_SAVE_FILE_DIR);
         return;
     }
+
+    std::unique_ptr<ORB_SLAM2::System> SLAM;
+    std::unique_ptr<ORB_SLAM2::SlamData> SLAMDATA;
+    std::unique_ptr<ORB_SLAM2::ImageGrabber> igb;
 };
 
 PLUGINLIB_EXPORT_CLASS(ORBSLAMNodelet, nodelet::Nodelet)

@@ -11,19 +11,21 @@ public:
 
         std::string host_ip = "localhost";
         private_nh.getParam("host_ip", host_ip);
-        AirsimROSWrapper airsim_ros_wrapper(nh, private_nh, host_ip);
+        airsim_ros_wrapper = std::unique_ptr<AirsimROSWrapper>(new AirsimROSWrapper(nh, private_nh, host_ip));
 
-        if (airsim_ros_wrapper.is_used_img_timer_cb_queue_)
+        if (airsim_ros_wrapper->is_used_img_timer_cb_queue_)
         {
-            airsim_ros_wrapper.img_async_spinner_.start();
+            airsim_ros_wrapper->img_async_spinner_.start();
         }
 
-        if (airsim_ros_wrapper.is_used_lidar_timer_cb_queue_)
+        if (airsim_ros_wrapper->is_used_lidar_timer_cb_queue_)
         {
-            airsim_ros_wrapper.lidar_async_spinner_.start();
+            airsim_ros_wrapper->lidar_async_spinner_.start();
         }
 
     }
+
+    std::unique_ptr<AirsimROSWrapper> airsim_ros_wrapper;
 };
 
 PLUGINLIB_EXPORT_CLASS(AirsimNodelet, nodelet::Nodelet)
