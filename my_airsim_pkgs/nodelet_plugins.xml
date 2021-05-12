@@ -1,0 +1,7 @@
+<library path="lib/libExplorationNodelet">
+    <class name="AirsimNodelet" type="AirsimNodelet" base_class_type="nodelet::Nodelet">
+        <description>
+            Airsim nodelet.
+        </description>
+    </class>
+</library>

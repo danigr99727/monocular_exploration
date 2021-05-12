@@ -36,25 +36,10 @@
 
 #include <System.h>
 
-#include "SlamData.h"
+#include "orb_slam_wrapper.h"
 
-using namespace std;
+//using namespace std;
 
-class ImageGrabber
-{
-public:
-    ImageGrabber(ORB_SLAM2::System* pSLAM, ORB_SLAM2::SlamData* pSLAMDATA)
-    {
-        mpSLAM = pSLAM;
-        mpSLAMDATA = pSLAMDATA;
-    }
-
-    void GrabImage(const sensor_msgs::ImageConstPtr& msg);
-
-    ORB_SLAM2::System* mpSLAM;
-
-    ORB_SLAM2::SlamData* mpSLAMDATA;
-};
 
 int main(int argc, char **argv)
 {
@@ -64,39 +49,17 @@ int main(int argc, char **argv)
 
     bool bUseViewer, bEnablePublishROSTopic;
 
-    if(argc == 3)
-    {
-        ROS_WARN_STREAM("bUseViewer not set, use default value: Disable Viewer");
-        ROS_WARN_STREAM("bEnablePublishROSTopic not set, use default value: Publishing ROS topics");
-        bUseViewer = false;
-        bEnablePublishROSTopic = true;
-    }
-    else if(argc == 4)
-    {
-        ROS_WARN_STREAM("bEnablePublishROSTopic not set, use default value: Publishing ROS topics");
-        bEnablePublishROSTopic = true;
-    }
-    else if((argc < 3) || (argc > 5))
-    {
-        cerr << endl << "Usage: rosrun ORB_SLAM2 Mono path_to_vocabulary path_to_settings bUseViewer bEnablePublishROSTopic" << endl;        
-        ros::shutdown();
-        return 1;
-    }    
-    
-    stringstream ss1(argv[3]), ss2(argv[4]);
-    ss1 >> boolalpha >> bUseViewer;
-    ss2 >> boolalpha >> bEnablePublishROSTopic;
+    bUseViewer = false;
+    bEnablePublishROSTopic = true;
     
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
-    ORB_SLAM2::System SLAM(argv[1],argv[2],ORB_SLAM2::System::MONOCULAR, false);
+    ORB_SLAM2::System SLAM(argv[1],argv[2],ORB_SLAM2::System::MONOCULAR, bUseViewer);
 
     ros::NodeHandle nodeHandler;
 
     ORB_SLAM2::SlamData SLAMDATA(&SLAM, &nodeHandler, bEnablePublishROSTopic);
 
-    ImageGrabber igb(&SLAM, &SLAMDATA);  
-    
-    ros::Subscriber sub = nodeHandler.subscribe("/camera/image_raw", 1, &ImageGrabber::GrabImage,&igb);
+    ORB_SLAM2::ImageGrabber igb(&SLAM, &SLAMDATA, &nodeHandler);
 
     ros::spin();
 
@@ -110,48 +73,5 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void ImageGrabber::GrabImage(const sensor_msgs::ImageConstPtr& msg)
-{
-    // Saves 3 points of time to calculate fps: begin, finish cv process and finish SLAM process
-    mpSLAMDATA->SaveTimePoint(ORB_SLAM2::SlamData::TimePointIndex::TIME_BEGIN);
-   
-    // Copy the ros image message to cv::Mat.
-    cv_bridge::CvImageConstPtr cv_ptr;
-    try
-    {
-        cv_ptr = cv_bridge::toCvShare(msg);
-    }
-    catch (cv_bridge::Exception& e)
-    {
-        ROS_ERROR("cv_bridge exception: %s", e.what());
-        return;
-    }
-
-    mpSLAMDATA->SaveTimePoint(ORB_SLAM2::SlamData::TimePointIndex::TIME_FINISH_CV_PROCESS);
-
-    cv::Mat Tcw = mpSLAM->TrackMonocular(cv_ptr->image, cv_ptr->header.stamp.toSec());
-
-    mpSLAMDATA->SaveTimePoint(ORB_SLAM2::SlamData::TimePointIndex::TIME_FINISH_SLAM_PROCESS);
-
-    //mpSLAMDATA->CalculateAndPrintOutProcessingFrequency();
-
-    if (Tcw.empty()) {
-      return;
-    }
-
-    if (mpSLAMDATA->EnablePublishROSTopics())
-    {
-
-        mpSLAMDATA->PublishTFForROS(Tcw, cv_ptr);
-
-        mpSLAMDATA->PublishTFMessage(Tcw, cv_ptr);
-
-        //mpSLAMDATA->PublishPoseForROS(cv_ptr);
-
-        //mpSLAMDATA->PublishPointCloudForROS();
-
-        mpSLAMDATA->PublishCurrentFrameForROS();
-    }
-}
 
 

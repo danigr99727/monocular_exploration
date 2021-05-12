@@ -1,12 +1,61 @@
-#include "SlamData.h"
+#include "orb_slam_wrapper.h"
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
 #include <Eigen/Geometry> 
 #include <opencv2/core/core.hpp>
+#include <nav_msgs/Odometry.h>
 
 namespace ORB_SLAM2
 {
+
+void ImageGrabber::GrabImage(const sensor_msgs::ImageConstPtr& msg)
+{
+    // Saves 3 points of time to calculate fps: begin, finish cv process and finish SLAM process
+    mpSLAMDATA->SaveTimePoint(ORB_SLAM2::SlamData::TimePointIndex::TIME_BEGIN);
+
+    // Copy the ros image message to cv::Mat.
+    cv_bridge::CvImageConstPtr cv_ptr;
+    try
+    {
+        cv_ptr = cv_bridge::toCvShare(msg);
+    }
+    catch (cv_bridge::Exception& e)
+    {
+        ROS_ERROR("cv_bridge exception: %s", e.what());
+        return;
+    }
+
+    mpSLAMDATA->SaveTimePoint(ORB_SLAM2::SlamData::TimePointIndex::TIME_FINISH_CV_PROCESS);
+
+    cv::Mat Tcw = mpSLAM->TrackMonocular(cv_ptr->image, cv_ptr->header.stamp.toSec());
+
+    mpSLAMDATA->SaveTimePoint(ORB_SLAM2::SlamData::TimePointIndex::TIME_FINISH_SLAM_PROCESS);
+
+    //mpSLAMDATA->CalculateAndPrintOutProcessingFrequency();
+
+    if (Tcw.empty()) {
+        return;
+    }
+
+    if (mpSLAMDATA->EnablePublishROSTopics())
+    {
+
+        mpSLAMDATA->CalculateNewTransform(Tcw, ros::Time(cv_ptr->header.stamp),  cv_ptr->header.seq);
+
+        mpSLAMDATA->PublishTFForROS();
+
+        mpSLAMDATA->PublishTFMessage();
+
+        //mpSLAMDATA->PublishPoseForROS();
+
+        //mpSLAMDATA->PublishPointCloudForROS();
+
+        mpSLAMDATA->PublishOdometry();
+
+        //mpSLAMDATA->PublishCurrentFrameForROS();
+    }
+}
 
 SlamData::SlamData(ORB_SLAM2::System* pSLAM, ros::NodeHandle *nodeHandler, bool bPublishROSTopic)
 {
@@ -20,8 +69,8 @@ SlamData::SlamData(ORB_SLAM2::System* pSLAM, ros::NodeHandle *nodeHandler, bool 
 
     tf_pub = (*nodeHandler).advertise<geometry_msgs::TransformStamped>("/transform", 1000);
     pose_pub = (*nodeHandler).advertise<geometry_msgs::PoseStamped>("/posestamped_s20", 1000);
-    pose_inc_pub = (*nodeHandler).advertise<geometry_msgs::PoseWithCovarianceStamped>("incremental_pose_cov", 1000);
- 
+    odom_pub = (*nodeHandler).advertise<nav_msgs::Odometry>("/odometry", 1000);
+
     all_point_cloud_pub = (*nodeHandler).advertise<sensor_msgs::PointCloud2>("point_cloud_all",1);
     ref_point_cloud_pub = (*nodeHandler).advertise<sensor_msgs::PointCloud2>("point_cloud_ref",1);
 
@@ -72,45 +121,37 @@ void SlamData::CalculateAndPrintOutProcessingFrequency(void)
     spinCnt++;
 }
 
-void SlamData::PublishTFForROS(cv::Mat Tcw, cv_bridge::CvImageConstPtr cv_ptr)
+void SlamData::CalculateNewTransform(const cv::Mat& Tcw, const ros::Time& time, int seq)
 {
+    last_transform = new_transform;
+    last_time = new_time;
+    new_time = time;
+    new_seq = seq;
+
     cv::Mat Rwc = Tcw.rowRange(0,3).colRange(0,3).t();
     cv::Mat twc = -Rwc*Tcw.rowRange(0,3).col(3);
 
     vector<float> q = ORB_SLAM2::Converter::toQuaternion(Rwc);
 
-    static tf::TransformBroadcaster br;
 
     new_transform.setOrigin(tf::Vector3(twc.at<float>(0, 0) * MAP_SCALE, twc.at<float>(0, 1) * MAP_SCALE, twc.at<float>(0, 2) * MAP_SCALE));
 
     tf::Quaternion tf_quaternion(q[0], q[1], q[2], q[3]);
 
     new_transform.setRotation(tf_quaternion);
-
-    br.sendTransform(tf::StampedTransform(new_transform, ros::Time(cv_ptr->header.stamp.toSec()), "camera_world", "s20cam_wide"));
 }
 
-void SlamData::PublishTFMessage(cv::Mat Tcw, cv_bridge::CvImageConstPtr cv_ptr)
+void SlamData::PublishTFForROS()
 {
-    //cv::Mat Rwc = Tcw.rowRange(0,3).colRange(0,3).t();
-    //cv::Mat twc = -Rwc*Tcw.rowRange(0,3).col(3);
+    static tf::TransformBroadcaster br;
+    br.sendTransform(tf::StampedTransform(new_transform, new_time, "camera_world", "s20cam_wide"));
+}
 
-
-    //vector<float> q = ORB_SLAM2::Converter::toQuaternion(Rwc);
-
-    //static tf::TransformBroadcaster br;
-
-    //new_transform.setOrigin(tf::Vector3(twc.at<float>(0, 0) * MAP_SCALE, twc.at<float>(0, 1) * MAP_SCALE, twc.at<float>(0, 2) * MAP_SCALE));
-
-    //tf::Quaternion tf_quaternion(q[0], q[1], q[2], q[3]);
-
-    //new_transform.setRotation(tf_quaternion);
-
-    //br.sendTransform(tf::StampedTransform(new_transform, ros::Time(cv_ptr->header.stamp.toSec()), "world", "s20cam_wide"));
-
+void SlamData::PublishTFMessage()
+{
     geometry_msgs::TransformStamped tfStamped;
-    tfStamped.header.stamp.fromSec(cv_ptr->header.stamp.toSec());
-    std::cout<<"pose sent: " << cv_ptr->header.stamp.toSec()<<std::endl;
+    tfStamped.header.stamp = new_time;
+    //std::cout<<"pose sent: " << cv_ptr->header.stamp.toSec()<<std::endl;
     //tfStamped.header.seq = cv_ptr->header.seq;
     tfStamped.header.frame_id =  "camera_world";
     tfStamped.child_frame_id = "camera";
@@ -127,29 +168,31 @@ void SlamData::PublishTFMessage(cv::Mat Tcw, cv_bridge::CvImageConstPtr cv_ptr)
 
 }
 
-void SlamData::PublishPoseForROS(const cv_bridge::CvImageConstPtr& cv_ptr)
+void SlamData::PublishPoseForROS()
 {
     static int frame_num = 0;
     geometry_msgs::PoseStamped pose;
-    pose.header.stamp = cv_ptr->header.stamp;
+    pose.header.stamp = new_time;
     pose.header.frame_id ="camera_world";
     tf::poseTFToMsg(new_transform, pose.pose);
     pose_pub.publish(pose);
-    geometry_msgs::PoseWithCovarianceStamped pose_inc_cov;
-    pose_inc_cov.header.stamp = cv_ptr->header.stamp;
-    pose_inc_cov.header.frame_id = "keyframe_" + to_string(frame_num++);
-    tf::poseTFToMsg(last_transform.inverse()*new_transform, pose_inc_cov.pose.pose);
-    pose_inc_cov.pose.covariance[0*7] = 0.0005;
-    pose_inc_cov.pose.covariance[1*7] = 0.0005;
-    pose_inc_cov.pose.covariance[2*7] = 0.0005;
-    pose_inc_cov.pose.covariance[3*7] = 0.0001;
-    pose_inc_cov.pose.covariance[4*7] = 0.0001;
-    pose_inc_cov.pose.covariance[5*7] = 0.0001;
+}
 
-    pose_inc_pub.publish(pose_inc_cov);
+void SlamData::PublishOdometry()
+{
+    nav_msgs::Odometry odom;
 
-    last_transform = new_transform;
+    tf::poseTFToMsg(new_transform, odom.pose.pose);
+    odom.header.frame_id="camera_world";
+    odom.header.stamp = new_time;
+    odom.header.seq = new_seq;
+    odom.child_frame_id = "camera";
+    auto timeDiff = (new_time - last_time).toSec();
+    odom.twist.twist.linear.x = (new_transform.getOrigin()[0] - new_transform.getOrigin()[0])/timeDiff;
+    odom.twist.twist.linear.y = (new_transform.getOrigin()[1] - new_transform.getOrigin()[1])/timeDiff;
+    odom.twist.twist.linear.z = (new_transform.getOrigin()[2] - new_transform.getOrigin()[2])/timeDiff;
 
+    odom_pub.publish(odom);
 }
 
 void SlamData::PublishPointCloudForROS(void)

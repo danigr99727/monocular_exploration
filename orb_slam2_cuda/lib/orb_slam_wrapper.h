@@ -12,7 +12,6 @@
 #include <nav_msgs/Path.h>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
@@ -41,6 +40,7 @@
 
 #define KEYFRAME_TRAJECTORY_TUM_SAVE_FILE_DIR "/home/ubuntu/ORB_SLAM2_CUDA/test_results/Mono_KeyFrameTrajectory.txt"
 
+
 namespace ORB_SLAM2
 {
 
@@ -66,11 +66,15 @@ namespace ORB_SLAM2
 
         void CalculateAndPrintOutProcessingFrequency(void);
 
-        void PublishTFForROS(cv::Mat Tcw, cv_bridge::CvImageConstPtr cv_ptr);
+        void PublishTFForROS();
 
-        void PublishTFMessage(cv::Mat Tcw, cv_bridge::CvImageConstPtr cv_ptr);
+        void PublishTFMessage();
 
-        void PublishPoseForROS(const cv_bridge::CvImageConstPtr& cv_ptr);
+        void PublishPoseForROS();
+
+        void CalculateNewTransform(const cv::Mat& Tcw, const ros::Time& time, int seq);
+
+        void PublishOdometry();
 
         void PublishPointCloudForROS(void);
 
@@ -85,15 +89,13 @@ namespace ORB_SLAM2
         
         FrameDrawer* mpFrameDrawer;
         
-        ros::Publisher pose_pub;
-        ros::Publisher pose_inc_pub;
-        ros::Publisher tf_pub;
-        ros::Publisher all_point_cloud_pub;
-        ros::Publisher ref_point_cloud_pub;  
+        ros::Publisher pose_pub, tf_pub, all_point_cloud_pub, ref_point_cloud_pub, odom_pub;
 
         image_transport::Publisher current_frame_pub;
 
         tf::Transform new_transform, last_transform;
+        ros::Time new_time, last_time;
+        int new_seq;
 
         Eigen::Matrix3f mInitCam2Ground_R;
         Eigen::Vector3f mInitCam2Ground_t;
@@ -102,6 +104,24 @@ namespace ORB_SLAM2
         std::chrono::steady_clock::time_point tp1, tp2, tp3;
 
         void GetCurrentROSPointCloud(sensor_msgs::PointCloud2 &all_point_cloud, sensor_msgs::PointCloud2 &ref_point_cloud);
+    };
+
+    class ImageGrabber
+    {
+    public:
+        ImageGrabber(ORB_SLAM2::System* pSLAM, ORB_SLAM2::SlamData* pSLAMDATA,  ros::NodeHandle *nodeHandler)
+                : mpSLAM(pSLAM),
+                  mpSLAMDATA(pSLAMDATA),
+                  nh(nodeHandler),
+                  sub(nodeHandler->subscribe("/camera/image_raw", 1, &ImageGrabber::GrabImage, this))
+        {}
+
+        void GrabImage(const sensor_msgs::ImageConstPtr& msg);
+
+        ros::Subscriber sub;
+        ORB_SLAM2::System* mpSLAM;
+        ORB_SLAM2::SlamData* mpSLAMDATA;
+        ros::NodeHandle* nh;
     };
 }
 #endif // SLAMDATA_H

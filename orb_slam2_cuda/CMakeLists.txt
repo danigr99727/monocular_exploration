@@ -71,7 +71,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/../../third_party/ORB_SLAM2_CUDA/lib/libORB_SLAM2_CU
 
 # Node for monocular camera
 add_executable(Mono
-lib/SlamData.cc
+        lib/orb_slam_wrapper.cc
 src/ros_mono.cc
 )
 
