@@ -40,6 +40,14 @@
 
 #define KEYFRAME_TRAJECTORY_TUM_SAVE_FILE_DIR "/home/ubuntu/ORB_SLAM2_CUDA/test_results/Mono_KeyFrameTrajectory.txt"
 
+template <typename T>
+void getParamOrFail(const ros::NodeHandle& nh, const std::string& name, T* val) {
+    if (!nh.getParam(name, *val)) {
+        ROS_ERROR("Failed to find parameter: %s", nh.resolveName(name, true).c_str());
+        exit(1);
+    }
+    return;
+}
 
 namespace ORB_SLAM2
 {

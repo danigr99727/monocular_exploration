@@ -44,7 +44,6 @@
 class ORBSLAMNodelet : public nodelet::Nodelet {
 public:
     virtual void onInit() {
-        ros::NodeHandle& private_nh = getPrivateNodeHandle();
         ros::NodeHandle& nh = getNodeHandle();
 
         bool bUseViewer, bEnablePublishROSTopic;
@@ -52,8 +51,11 @@ public:
         bUseViewer = false;
         bEnablePublishROSTopic = true;
 
+        getParamOrFail(nh, "voc_file", &voc_file);
+        getParamOrFail(nh, "settings_file", &settings_file);
+
         // Create SLAM system. It initializes all system threads and gets ready to process frames.
-        SLAM = std::unique_ptr<ORB_SLAM2::System>(new ORB_SLAM2::System(argv[1],argv[2],ORB_SLAM2::System::MONOCULAR, bUseViewer));
+        SLAM = std::unique_ptr<ORB_SLAM2::System>(new ORB_SLAM2::System(voc_file, settings_file,ORB_SLAM2::System::MONOCULAR, bUseViewer));
         SLAMDATA = std::unique_ptr<ORB_SLAM2::SlamData>(new ORB_SLAM2::SlamData(SLAM.get(), &nh, bEnablePublishROSTopic));
         igb = std::unique_ptr<ORB_SLAM2::ImageGrabber>(new ORB_SLAM2::ImageGrabber(SLAM.get(), SLAMDATA.get(), &nh));
     }
@@ -65,6 +67,7 @@ public:
         return;
     }
 
+    std::string voc_file, settings_file;
     std::unique_ptr<ORB_SLAM2::System> SLAM;
     std::unique_ptr<ORB_SLAM2::SlamData> SLAMDATA;
     std::unique_ptr<ORB_SLAM2::ImageGrabber> igb;

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-    <arg name="vocabularty_path" default="$(find orb_slam2_cuda)/Vocabulary/ORBvoc.txt" />
+    <arg name="vocabulary_path" default="$(find orb_slam2_cuda)/Vocabulary/ORBvoc.txt" />
     <arg name="camera_setting_path" default="$(find my_pipeline)/calibration/TUM1_rect.yaml" />
     <arg name="bUseViewer" default="true" />
     <arg name="bEnablePublishROSTopic" default="true" />
@@ -12,7 +12,8 @@
 
 
    <node name="orb_slam2_cuda" pkg="orb_slam2_cuda" type="Mono" output="screen"
-    	args="$(arg vocabularty_path) $(arg camera_setting_path) $(arg bUseViewer) $(arg bEnablePublishROSTopic)">
+    	<param name="voc_file" value="$(arg vocabulary_path)"/>
+    	<param name="settings_file" value="$(arg camera_setting_path)"/>
     	<remap from="/camera/image_raw" to="/camera/rgb/image_rect"/>
     	<remap from="/transform" to="/orb_slam2/transform"/>
   	</node>

@@ -48,18 +48,19 @@ int main(int argc, char **argv)
     ros::start();
 
     bool bUseViewer, bEnablePublishROSTopic;
-
+    std::string voc_file, settings_file;
     bUseViewer = false;
     bEnablePublishROSTopic = true;
-    
+
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
-    ORB_SLAM2::System SLAM(argv[1],argv[2],ORB_SLAM2::System::MONOCULAR, bUseViewer);
 
-    ros::NodeHandle nodeHandler;
+    ros::NodeHandle nh;
 
-    ORB_SLAM2::SlamData SLAMDATA(&SLAM, &nodeHandler, bEnablePublishROSTopic);
-
-    ORB_SLAM2::ImageGrabber igb(&SLAM, &SLAMDATA, &nodeHandler);
+    getParamOrFail(nh, "voc_file", &voc_file);
+    getParamOrFail(nh, "settings_file", &settings_file);
+    ORB_SLAM2::System SLAM(voc_file, settings_file,ORB_SLAM2::System::MONOCULAR, bUseViewer);
+    ORB_SLAM2::SlamData SLAMDATA(&SLAM, &nh, bEnablePublishROSTopic);
+    ORB_SLAM2::ImageGrabber igb(&SLAM, &SLAMDATA, &nh);
 
     ros::spin();
 
