@@ -15,4 +15,8 @@
     <build_depend>flame_ros</build_depend>
     <build_depend>plan_env</build_depend>
 
+    <exec_depend>airsim_ros_pkgs</exec_depend>
+    <exec_depend>my_airsim_pkgs</exec_depend>
+
+
 </package>

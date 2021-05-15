@@ -4,7 +4,7 @@
 <!-- AirSim ROS Wrapper -->
 	<include file="$(find my_airsim_pkgs)/launch/airsim_node.launch">
 		<arg name="output" value="screen"/>
-		<arg name="host" value="129.31.139.190"/>
+		<arg name="host" value="129.31.243.214"/>
 	</include>
 <!-- Vehicle Dynamic Constraints -->
 	<include file="$(find airsim_ros_pkgs)/launch/dynamic_constraints.launch"/>
@@ -35,7 +35,7 @@
     <!-- depth topic: depth image, 640x480 by default -->
     <!-- cloud topic: point cloud measurement  -->
     <!-- subscribe ONLY TO ONE of the two topics -->
-    <arg name="depth_topic" value="/airsim_node/drone_1/front_center_custom/DepthPerspective"/>
+    <arg name="depth_topic" value="/airsim_node/drone_1/front_center_custom/DepthPlanar"/>
     <arg name="semantic_topic" value="/airsim_node/drone_1/front_center_custom/Segmentation"/>
     <arg name="cloud_topic" value="/pcl_render_node/cloud"/>
 
@@ -59,9 +59,7 @@
     <param name="waypoint_type" value="point"/>
   </node>
 
-  <node pkg="plan_manage" name="airsim_traj_server" type="airsim_traj_server" output="screen">
-    <!--<remap from="/position_cmd" to="planning/pos_cmd"/>-->
-
+ <node pkg="plan_manage" name="airsim_traj_server" type="airsim_traj_server" output="screen">
     <remap from="/odom_world" to="$(arg odom_topic)"/>
     <param name="traj_server/time_forward" value="1.5" type="double"/>
     <param name="traj_server/pub_traj_id" value="4" type="int"/>

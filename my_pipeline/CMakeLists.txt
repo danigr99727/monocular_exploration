@@ -9,6 +9,7 @@ project(my_pipeline LANGUAGES CXX C)
 find_package(catkin REQUIRED COMPONENTS
         roscpp
         std_msgs
+        airsim_ros_pkgs
         tf
         )
 #################################
