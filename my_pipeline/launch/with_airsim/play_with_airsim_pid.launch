@@ -9,7 +9,7 @@
 <!-- Vehicle Dynamic Constraints -->
 	<include file="$(find airsim_ros_pkgs)/launch/dynamic_constraints.launch"/>
 <!-- Simple PID Position Controller -->
-	<!--<include file="$(find my_airsim_pkgs)/launch/position_controller_simple.launch"/>-->
+	<include file="$(find my_airsim_pkgs)/launch/position_controller_simple.launch"/>
 -->
 
   <arg name="map_size_x" value="50.0"/>
@@ -19,7 +19,7 @@
   <!-- topic of your odometry such as VIO or LIO -->
 
     <node pkg="tf" type="static_transform_publisher" name="tf_53" args="0 0 0 0 0 0 world navigation 100" />
-    <node pkg="tf" type="static_transform_publisher" name="tf_world_to_enu" args="0 0 0 0 0 0 world world_enu 10" />
+    <node pkg="tf" type="static_transform_publisher" name="tf_world_to_enu" args="0 0 0 0 0 0 world world_enu 100" />
 
   <!-- main algorithm params -->
   <include file="$(find exploration_manager)/launch/algorithm_semantic.xml">
@@ -58,7 +58,7 @@
     <param name="waypoint_type" value="point"/>
   </node>
 
- <node pkg="plan_manage" name="airsim_traj_server" type="airsim_traj_server" output="screen">
+ <node pkg="plan_manage" name="airsim_traj_server_pid" type="airsim_traj_server_pid" output="screen">
     <remap from="/odom_world" to="$(arg odom_topic)"/>
     <param name="traj_server/time_forward" value="1.5" type="double"/>
     <param name="traj_server/pub_traj_id" value="4" type="int"/>

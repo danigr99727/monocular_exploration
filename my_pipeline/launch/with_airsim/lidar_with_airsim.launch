@@ -4,7 +4,7 @@
 <!-- AirSim ROS Wrapper -->
 	<include file="$(find my_airsim_pkgs)/launch/airsim_node.launch">
 		<arg name="output" value="screen"/>
-		<arg name="host" value="localhost"/>
+		<arg name="host" value="129.31.224.245"/>
 	</include>
 <!-- Vehicle Dynamic Constraints -->
 	<include file="$(find airsim_ros_pkgs)/launch/dynamic_constraints.launch"/>
@@ -19,10 +19,10 @@
   <!-- topic of your odometry such as VIO or LIO -->
 
     <node pkg="tf" type="static_transform_publisher" name="tf_53" args="0 0 0 0 0 0 world navigation 100" />
-    <node pkg="tf" type="static_transform_publisher" name="tf_world_to_enu" args="0 0 0 0 0 0 world world_enu 10" />
+    <node pkg="tf" type="static_transform_publisher" name="tf_world_to_enu" args="0 0 0 0 0 0 world_enu world 100" />
 
   <!-- main algorithm params -->
-  <include file="$(find exploration_manager)/launch/algorithm_semantic.xml">
+  <include file="$(find my_pipeline)/launch/algorithm_only_esdf.xml">
 
     <arg name="map_size_x_" value="$(arg map_size_x)"/>
     <arg name="map_size_y_" value="$(arg map_size_y)"/>
@@ -34,9 +34,9 @@
     <!-- depth topic: depth image, 640x480 by default -->
     <!-- cloud topic: point cloud measurement  -->
     <!-- subscribe ONLY TO ONE of the two topics -->
-    <arg name="depth_topic" value="/airsim_node/drone_1/front_center_custom/DepthPlanar"/>
+    <arg name="depth_topic" value="/airsim_node/none/front_center_custom/DepthPlanar"/>
     <arg name="semantic_topic" value="/airsim_node/drone_1/front_center_custom/Infrared"/>
-    <arg name="cloud_topic" value="/pcl_render_node/cloud"/>
+    <arg name="cloud_topic" value="/airsim_node/drone_1/lidar/LidarCustom"/>
 
     <!-- intrinsic params of the depth camera -->
     <arg name="cx" value="160.0"/>
@@ -58,17 +58,5 @@
     <param name="waypoint_type" value="point"/>
   </node>
 
- <node pkg="plan_manage" name="airsim_traj_server" type="airsim_traj_server" output="screen">
-    <remap from="/odom_world" to="$(arg odom_topic)"/>
-    <param name="traj_server/time_forward" value="1.5" type="double"/>
-    <param name="traj_server/pub_traj_id" value="4" type="int"/>
-
-    <param name="perception_utils/top_angle" value="0.56125" type="double"/>
-    <param name="perception_utils/left_angle" value="0.69222" type="double"/>
-    <param name="perception_utils/right_angle" value="0.68901" type="double"/>
-    <param name="perception_utils/max_dist" value="4.5" type="double"/>
-    <param name="perception_utils/vis_dist" value="1.0" type="double"/>
-
-  </node>
 
 </launch>
