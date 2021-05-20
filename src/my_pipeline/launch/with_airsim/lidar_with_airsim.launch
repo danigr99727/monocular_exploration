@@ -1,0 +1,62 @@
+<launch>
+<arg name="odom_topic" value="/airsim_node/drone_1/odom_local_enu" />
+
+<!-- AirSim ROS Wrapper -->
+	<include file="$(find my_airsim_pkgs)/launch/airsim_node.launch">
+		<arg name="output" value="screen"/>
+		<arg name="host" value="129.31.224.245"/>
+	</include>
+<!-- Vehicle Dynamic Constraints -->
+	<include file="$(find airsim_ros_pkgs)/launch/dynamic_constraints.launch"/>
+<!-- Simple PID Position Controller -->
+	<!--<include file="$(find my_airsim_pkgs)/launch/position_controller_simple.launch"/>-->
+-->
+
+  <arg name="map_size_x" value="50.0"/>
+  <arg name="map_size_y" value="50.0"/>
+  <arg name="map_size_z" value=" 10.0"/>
+
+  <!-- topic of your odometry such as VIO or LIO -->
+
+    <node pkg="tf" type="static_transform_publisher" name="tf_53" args="0 0 0 0 0 0 world navigation 100" />
+    <node pkg="tf" type="static_transform_publisher" name="tf_world_to_enu" args="0 0 0 0 0 0 world_enu world 100" />
+
+  <!-- main algorithm params -->
+  <include file="$(find my_pipeline)/launch/algorithm_only_esdf.xml">
+
+    <arg name="map_size_x_" value="$(arg map_size_x)"/>
+    <arg name="map_size_y_" value="$(arg map_size_y)"/>
+    <arg name="map_size_z_" value="$(arg map_size_z)"/>
+    <arg name="odometry_topic" value="$(arg odom_topic)"/>
+
+    <!-- sensor pose: transform of camera frame in the world frame -->
+    <arg name="sensor_pose_topic" value="/transform_rgb_frame"/>
+    <!-- depth topic: depth image, 640x480 by default -->
+    <!-- cloud topic: point cloud measurement  -->
+    <!-- subscribe ONLY TO ONE of the two topics -->
+    <arg name="depth_topic" value="/airsim_node/none/front_center_custom/DepthPlanar"/>
+    <arg name="semantic_topic" value="/airsim_node/drone_1/front_center_custom/Infrared"/>
+    <arg name="cloud_topic" value="/airsim_node/drone_1/lidar/LidarCustom"/>
+
+    <!-- intrinsic params of the depth camera -->
+    <arg name="cx" value="160.0"/>
+    <arg name="cy" value="120.0"/>
+    <arg name="fx" value="112.033203125"/>
+    <arg name="fy" value="112.033203125"/>
+
+    <!-- maximum velocity and acceleration the drone will reach -->
+    <arg name="max_vel" value="2.0" />
+    <arg name="max_acc" value="2.0" />
+  </include>
+
+  <node name="rvizesdfvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find my_pipeline)/cfg/airsim_semantic_esdf.rviz" />
+
+  <node pkg="waypoint_generator" name="waypoint_generator" type="waypoint_generator" output="screen">
+    <remap from="~odom" to="$(arg odom_topic)"/>
+    <remap from="~goal" to="/move_base_simple/goal"/>
+    <remap from="~traj_start_trigger" to="/traj_start_trigger" />
+    <param name="waypoint_type" value="point"/>
+  </node>
+
+
+</launch>
