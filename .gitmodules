@@ -10,12 +10,15 @@
 [submodule "tdnet_nyud"]
 	path = src/tdnet_nyud
 	url = https://github.com/danigr99727/tdnet_nyud
+
 [submodule "third_party/AirSim"]
 	path = third_party/AirSim
 	url = https://github.com/microsoft/AirSim/
+
 [submodule "third_party/flame"]
 	path = third_party/flame
 	url = https://github.com/robustrobotics/flame
+
 [submodule "third_party/ORB_SLAM2_CUDA"]
 	path = third_party/ORB_SLAM2_CUDA
 	url = https://github.com/danigr99727/ORB_SLAM2_CUDA
