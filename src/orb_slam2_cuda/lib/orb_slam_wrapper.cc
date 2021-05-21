@@ -68,7 +68,7 @@ SlamData::SlamData(ORB_SLAM2::System* pSLAM, ros::NodeHandle *nodeHandler, bool 
     last_transform.setRotation(q);
 
     tf_pub = (*nodeHandler).advertise<geometry_msgs::TransformStamped>("/transform", 1000);
-    pose_pub = (*nodeHandler).advertise<geometry_msgs::PoseStamped>("/posestamped_s20", 1000);
+    pose_pub = (*nodeHandler).advertise<geometry_msgs::PoseStamped>("/posestamped", 1000);
     odom_pub = (*nodeHandler).advertise<nav_msgs::Odometry>("/odometry", 1000);
 
     all_point_cloud_pub = (*nodeHandler).advertise<sensor_msgs::PointCloud2>("point_cloud_all",1);

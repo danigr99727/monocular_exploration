@@ -1,5 +1,5 @@
-<library path="lib/libORBSLAMNodelet">
-    <class name="ORBSLAMNodelet" type="ORBSLAMNodelet" base_class_type="nodelet::Nodelet">
+<library path="lib/liborb_slam_nodelet">
+    <class name="orb_slam2_cuda/ORBSLAMNodelet" type="ORBSLAMNodelet" base_class_type="nodelet::Nodelet">
         <description>
             Airsim nodelet.
         </description>
