@@ -69,7 +69,7 @@
     <node pkg="tf" type="static_transform_publisher" name="tf_world_to_enu" args="0 0 0 0 0 0 world world_enu 100" />
 
   <!-- main algorithm params -->
-      <node name="rvizfiestavisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find my_pipeline)/cfg/flame.rviz" />
+    <!--  <node name="rvizfiestavisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find my_pipeline)/cfg/flame.rviz" />-->
 
   <include file="$(find my_pipeline)/launch/algorithm_only_esdf.xml">
 
@@ -100,6 +100,6 @@
 
   <node name="performance_meter" pkg="my_pipeline" type="performance_meter" output="screen"/>
 
-  <node name="rvizesdfvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find my_pipeline)/cfg/airsim_groundtruth_esdf.rviz" />
+  <node name="rvizesdfvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find my_pipeline)/cfg/airsim_semantic_esdf.rviz" />
 
 </launch>

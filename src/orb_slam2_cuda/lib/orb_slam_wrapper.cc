@@ -168,11 +168,11 @@ void SlamData::PublishTFMessage()
     tfStamped.transform.translation.y = new_transform.getOrigin().y();
     tfStamped.transform.translation.z = new_transform.getOrigin().z();
     std::cout<<"sending transform..."<<std::endl;
-    tf_pub.publish(tfStamped);
 
     std_msgs::Header header_msg;
     header_msg.stamp = new_time; //ros::Time::now();
     sent_pub_.publish(header_msg);
+    tf_pub.publish(tfStamped);
 }
 
 void SlamData::PublishPoseForROS()

@@ -34,7 +34,7 @@ int main(int argc, char **argv)
 
     bool bUseViewer, bEnablePublishROSTopic;
     std::string voc_file, settings_file;
-    bUseViewer = true;
+    bUseViewer = false;
     bEnablePublishROSTopic = true;
 
     // Create SLAM system. It initializes all system threads and gets ready to process frames.

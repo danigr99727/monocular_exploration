@@ -39,7 +39,7 @@ public:
     virtual void onInit() {
         ros::NodeHandle& nh = getPrivateNodeHandle();
 
-        bUseViewer = true;
+        bUseViewer = false;
         bEnablePublishROSTopic = true;
         getParamOrFail(nh, "camera_setting_path", &settings_file);
         getParamOrFail(nh, "vocabulary_path", &voc_file);
