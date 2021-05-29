@@ -21,19 +21,10 @@
 
 #include<iostream>
 #include<algorithm>
-#include<fstream>
-#include<chrono>
-
-#include<tf/transform_broadcaster.h>
 
 #include<ros/ros.h>
-#include <Converter.h>
-#include <cv_bridge/cv_bridge.h>
 
 #include <opencv2/core/core.hpp>
-
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
-
 #include <System.h>
 
 #include "orb_slam_wrapper.h"
@@ -43,16 +34,15 @@
 
 class ORBSLAMNodelet : public nodelet::Nodelet {
 public:
+    ORBSLAMNodelet()=default;
+
     virtual void onInit() {
-        ros::NodeHandle& nh = getNodeHandle();
+        ros::NodeHandle& nh = getPrivateNodeHandle();
 
-        bool bUseViewer, bEnablePublishROSTopic;
-
-        bUseViewer = false;
+        bUseViewer = true;
         bEnablePublishROSTopic = true;
-
-        getParamOrFail(nh, "voc_file", &voc_file);
-        getParamOrFail(nh, "settings_file", &settings_file);
+        getParamOrFail(nh, "camera_setting_path", &settings_file);
+        getParamOrFail(nh, "vocabulary_path", &voc_file);
 
         // Create SLAM system. It initializes all system threads and gets ready to process frames.
         SLAM = std::unique_ptr<ORB_SLAM2::System>(new ORB_SLAM2::System(voc_file, settings_file,ORB_SLAM2::System::MONOCULAR, bUseViewer));
@@ -66,7 +56,7 @@ public:
         SLAM->SaveKeyFrameTrajectoryTUM(KEYFRAME_TRAJECTORY_TUM_SAVE_FILE_DIR);
         return;
     }
-
+    bool bUseViewer, bEnablePublishROSTopic;
     std::string voc_file, settings_file;
     std::unique_ptr<ORB_SLAM2::System> SLAM;
     std::unique_ptr<ORB_SLAM2::SlamData> SLAMDATA;

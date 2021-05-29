@@ -1,6 +1,29 @@
 <launch>
 <arg name="odom_topic" value="/airsim_node/drone_1/odom_local_enu" />
 
+    <arg name="config_path" default = "$(find feature_tracker)/../config/my_vins_config/airsim_config.yaml" />
+	  <arg name="vins_path" default = "$(find feature_tracker)/../config/../" />
+
+    <node name="feature_tracker" pkg="feature_tracker" type="feature_tracker" output="log">
+        <param name="config_file" type="string" value="$(arg config_path)" />
+        <param name="vins_folder" type="string" value="$(arg vins_path)" />
+    </node>
+
+    <node name="vins_estimator" pkg="vins_estimator" type="vins_estimator" output="screen">
+       <param name="config_file" type="string" value="$(arg config_path)" />
+       <param name="vins_folder" type="string" value="$(arg vins_path)" />
+    </node>
+
+    <node name="pose_graph" pkg="pose_graph" type="pose_graph" output="screen">
+        <param name="config_file" type="string" value="$(arg config_path)" />
+        <param name="visualization_shift_x" type="int" value="0" />
+        <param name="visualization_shift_y" type="int" value="0" />
+        <param name="skip_cnt" type="int" value="0" />
+        <param name="skip_dis" type="double" value="0" />
+    </node>
+
+    <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find vins_estimator)/../config/vins_rviz_config.rviz" />
+
 <!-- AirSim ROS Wrapper -->
 	<include file="$(find airsim_ros_pkgs)/launch/airsim_node.launch">
 		<arg name="output" value="screen"/>
@@ -35,7 +58,7 @@
     <!-- cloud topic: point cloud measurement  -->
     <!-- subscribe ONLY TO ONE of the two topics -->
     <arg name="depth_topic" value="/airsim_node/drone_1/front_center_custom/DepthPlanner"/>
-    <arg name="semantic_topic" value="/airsim_node/drone_1/front_center_custom/Infrared"/>
+    <arg name="semantic_topic" value="/semantic"/>
     <arg name="cloud_topic" value="/pcl_render_node/cloud"/>
 
     <!-- intrinsic params of the depth camera -->
@@ -73,7 +96,11 @@
 
   </node>
 
- <node pkg="nodelet" type="nodelet" args="standalone airsim_controller/AirsimControllerNodelet" name="airsim_controller" required="true" output="screen">
+   <!-- <node name="segmentator" pkg="tdnet_nyud" type="segmentation.py" output="screen">
+       <remap from="image_raw" to="/airsim_node/drone_1/front_center_custom/Scene" />
+    </node> -->
+
+ <!-- <node pkg="nodelet" type="nodelet" args="standalone airsim_controller/AirsimControllerNodelet" name="airsim_controller" required="true" output="screen">
         <remap from="~odom" to="$(arg odom_topic)"/>
         <remap from="~position_cmd" to="/planning/pos_cmd"/>
         <remap from="~motors" to="motors"/>
@@ -87,6 +114,6 @@
         <param name="use_external_yaw "      value="false"/>
         <param name="gains/rot/z" value="1.0"/>
         <param name="gains/ang/z" value="0.1"/>
-  </node>
+  </node>-->
 
 </launch>

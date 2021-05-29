@@ -11,7 +11,9 @@ namespace ORB_SLAM2
 
 void ImageGrabber::GrabImage(const sensor_msgs::ImageConstPtr& msg)
 {
-    // Saves 3 points of time to calculate fps: begin, finish cv process and finish SLAM process
+    std_msgs::Header header_msg;
+    header_msg.stamp = msg->header.stamp;
+    img_received_pub_.publish(header_msg);
     mpSLAMDATA->SaveTimePoint(ORB_SLAM2::SlamData::TimePointIndex::TIME_BEGIN);
 
     // Copy the ros image message to cv::Mat.
@@ -41,9 +43,9 @@ void ImageGrabber::GrabImage(const sensor_msgs::ImageConstPtr& msg)
     if (mpSLAMDATA->EnablePublishROSTopics())
     {
 
-        mpSLAMDATA->CalculateNewTransform(Tcw, ros::Time(cv_ptr->header.stamp),  cv_ptr->header.seq);
+        mpSLAMDATA->CalculateNewTransform(Tcw, ros::Time(msg->header.stamp),  msg->header.seq);
 
-        mpSLAMDATA->PublishTFForROS();
+        //mpSLAMDATA->PublishTFForROS();
 
         mpSLAMDATA->PublishTFMessage();
 
@@ -64,15 +66,18 @@ SlamData::SlamData(ORB_SLAM2::System* pSLAM, ros::NodeHandle *nodeHandler, bool 
     bEnablePublishROSTopic = bPublishROSTopic;
     // Perform tf transform and publish
     last_transform.setOrigin(tf::Vector3(0,0,0));
+    last_transform.setOrigin(tf::Vector3(0,0,0));
     tf::Quaternion q(0,0,0,1);
     last_transform.setRotation(q);
 
-    tf_pub = (*nodeHandler).advertise<geometry_msgs::TransformStamped>("/transform", 1000);
-    pose_pub = (*nodeHandler).advertise<geometry_msgs::PoseStamped>("/posestamped", 1000);
-    odom_pub = (*nodeHandler).advertise<nav_msgs::Odometry>("/odometry", 1000);
+    tf_pub = (*nodeHandler).advertise<geometry_msgs::TransformStamped>("/transform", 12);
+    pose_pub = (*nodeHandler).advertise<geometry_msgs::PoseStamped>("/posestamped", 12);
+    odom_pub = (*nodeHandler).advertise<nav_msgs::Odometry>("odometry", 12);
 
     all_point_cloud_pub = (*nodeHandler).advertise<sensor_msgs::PointCloud2>("point_cloud_all",1);
     ref_point_cloud_pub = (*nodeHandler).advertise<sensor_msgs::PointCloud2>("point_cloud_ref",1);
+
+    sent_pub_ = (*nodeHandler).advertise<std_msgs::Header>("/orb_slam2_cuda/sent", 500);
 
     mInitCam2Ground_R << 1,0,0,0,0,1,0,-1,0;  // camera coordinate represented in ground coordinate system
     mInitCam2Ground_t.setZero();     
@@ -121,12 +126,12 @@ void SlamData::CalculateAndPrintOutProcessingFrequency(void)
     spinCnt++;
 }
 
-void SlamData::CalculateNewTransform(const cv::Mat& Tcw, const ros::Time& time, int seq)
+void SlamData::CalculateNewTransform(const cv::Mat& Tcw, const ros::Time& time, uint32_t seq)
 {
     last_transform = new_transform;
     last_time = new_time;
     new_time = time;
-    new_seq = seq;
+    seq_ = seq;
 
     cv::Mat Rwc = Tcw.rowRange(0,3).colRange(0,3).t();
     cv::Mat twc = -Rwc*Tcw.rowRange(0,3).col(3);
@@ -141,11 +146,11 @@ void SlamData::CalculateNewTransform(const cv::Mat& Tcw, const ros::Time& time, 
     new_transform.setRotation(tf_quaternion);
 }
 
-void SlamData::PublishTFForROS()
+/*void SlamData::PublishTFForROS()
 {
     static tf::TransformBroadcaster br;
     br.sendTransform(tf::StampedTransform(new_transform, new_time, "camera_world", "s20cam_wide"));
-}
+}*/
 
 void SlamData::PublishTFMessage()
 {
@@ -165,7 +170,9 @@ void SlamData::PublishTFMessage()
     std::cout<<"sending transform..."<<std::endl;
     tf_pub.publish(tfStamped);
 
-
+    std_msgs::Header header_msg;
+    header_msg.stamp = new_time; //ros::Time::now();
+    sent_pub_.publish(header_msg);
 }
 
 void SlamData::PublishPoseForROS()
@@ -185,12 +192,11 @@ void SlamData::PublishOdometry()
     tf::poseTFToMsg(new_transform, odom.pose.pose);
     odom.header.frame_id="camera_world";
     odom.header.stamp = new_time;
-    odom.header.seq = new_seq;
     odom.child_frame_id = "camera";
     auto timeDiff = (new_time - last_time).toSec();
-    odom.twist.twist.linear.x = (new_transform.getOrigin()[0] - new_transform.getOrigin()[0])/timeDiff;
-    odom.twist.twist.linear.y = (new_transform.getOrigin()[1] - new_transform.getOrigin()[1])/timeDiff;
-    odom.twist.twist.linear.z = (new_transform.getOrigin()[2] - new_transform.getOrigin()[2])/timeDiff;
+    odom.twist.twist.linear.x = (new_transform.getOrigin()[0] - last_transform.getOrigin()[0])/timeDiff;
+    odom.twist.twist.linear.y = (new_transform.getOrigin()[1] - last_transform.getOrigin()[1])/timeDiff;
+    odom.twist.twist.linear.z = (new_transform.getOrigin()[2] - last_transform.getOrigin()[2])/timeDiff;
 
     odom_pub.publish(odom);
 }

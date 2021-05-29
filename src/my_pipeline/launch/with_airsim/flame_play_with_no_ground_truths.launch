@@ -1,19 +1,19 @@
 <launch>
-<arg name="odom_topic" value="/orb_slam2/odometry" />
+<arg name="odom_topic" value="/airsim_node/drone_1/odom_local_enu" />
 
-    <arg name="vocabulary_path" default="$(find orb_slam2_cuda)/Vocabulary/ORBvoc.txt" />
+   <!-- <arg name="vocabulary_path" default="$(find orb_slam2_cuda)/Vocabulary/ORBvoc.txt" />
     <arg name="camera_setting_path" default="$(find my_pipeline)/calibration/airsim.yaml" />
     <arg name="bUseViewer" default="true" />
-    <arg name="bEnablePublishROSTopic" default="true" />
+    <arg name="bEnablePublishROSTopic" default="true" /> -->
 
 
-   <node name="orb_slam2_cuda" pkg="orb_slam2_cuda" type="Mono" output="screen">
+   <!-- <node name="orb_slam2_cuda" pkg="orb_slam2_cuda" type="Mono" output="screen">
     	<param name="vocabulary_path" value="$(arg vocabulary_path)"/>
     	<param name="camera_setting_path" value="$(arg camera_setting_path)"/>
     	<remap from="/camera/image_raw" to="/airsim_node/drone_1/front_center_custom/Scene"/>
     	<remap from="/odometry" to="$(arg odom_topic)"/>
     	<remap from="/transform" to="/orb_slam2/transform"/>
-  	</node>
+  	</node> -->
 
     <!-- from flame nodelet launch -->
 
@@ -39,11 +39,11 @@
         <!-- Launch the nodelet.. -->
         <node pkg="nodelet" type="nodelet" name="flame_nodelet"
               args="load flame_ros/FlameNodelet $(arg manager)"
-              output="$(arg output_dest)" launch-prefix="bash -c 'sleep 1; $0 $@' ">
+              output="$(arg output_dest)" launch-prefix="bash -c 'sleep 5; $0 $@' ">
           <rosparam command="load" if="$(arg load_params)" file="$(find my_pipeline)/cfg/$(arg param_file)"/>
           <remap from="/image" to="/airsim_node/drone_1/front_center_custom/Scene" />
          <remap from="/info" to="/airsim_node/drone_1/front_center_custom/Scene/camera_info" />
-          <remap from="/transform" to="/orb_slam2/transform"/>
+          <remap from="/odom" to="$(arg odom_topic)"/>
           <remap from="keyframes" to="keyframes" />
         </node>
     </group>
@@ -71,7 +71,7 @@
   <!-- main algorithm params -->
       <node name="rvizfiestavisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find my_pipeline)/cfg/flame.rviz" />
 
-  <include file="$(find exploration_manager)/launch/algorithm_no_groundtruths.xml">
+  <include file="$(find exploration_manager)/launch/algorithm_semantic.xml">
 
     <arg name="map_size_x_" value="$(arg map_size_x)"/>
     <arg name="map_size_y_" value="$(arg map_size_y)"/>
@@ -88,10 +88,10 @@
     <arg name="cloud_topic" value="/none"/>
 
     <!-- intrinsic params of the depth camera -->
-    <arg name="cx" value="320.0"/>
-    <arg name="cy" value="240.0"/>
-    <arg name="fx" value="224.066203125"/>
-    <arg name="fy" value="224.066203125"/>
+    <arg name="cx" value="160.0"/>
+    <arg name="cy" value="120.0"/>
+    <arg name="fx" value="112.033203125"/>
+    <arg name="fy" value="112.033203125"/>
 
     <!-- maximum velocity and acceleration the drone will reach -->
     <arg name="max_vel" value="0.5" />

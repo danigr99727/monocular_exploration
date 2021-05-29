@@ -33,6 +33,7 @@
 #include <FrameDrawer.h>
 #include <MapDrawer.h>
 #include <System.h>
+#include <std_msgs/Header.h>
 
 #define MAP_SCALE 1.0f
 
@@ -80,7 +81,7 @@ namespace ORB_SLAM2
 
         void PublishPoseForROS();
 
-        void CalculateNewTransform(const cv::Mat& Tcw, const ros::Time& time, int seq);
+        void CalculateNewTransform(const cv::Mat& Tcw, const ros::Time& time, uint32_t seq);
 
         void PublishOdometry();
 
@@ -97,13 +98,13 @@ namespace ORB_SLAM2
         
         FrameDrawer* mpFrameDrawer;
         
-        ros::Publisher pose_pub, tf_pub, all_point_cloud_pub, ref_point_cloud_pub, odom_pub;
+        ros::Publisher pose_pub, tf_pub, all_point_cloud_pub, ref_point_cloud_pub, odom_pub, sent_pub_;
 
         image_transport::Publisher current_frame_pub;
 
         tf::Transform new_transform, last_transform;
         ros::Time new_time, last_time;
-        int new_seq;
+        uint32_t seq_;
 
         Eigen::Matrix3f mInitCam2Ground_R;
         Eigen::Vector3f mInitCam2Ground_t;
@@ -121,12 +122,14 @@ namespace ORB_SLAM2
                 : mpSLAM(pSLAM),
                   mpSLAMDATA(pSLAMDATA),
                   nh(nodeHandler),
-                  sub(nodeHandler->subscribe("/camera/image_raw", 1, &ImageGrabber::GrabImage, this))
-        {}
+                  sub(nodeHandler->subscribe("/camera/image_raw", 15, &ImageGrabber::GrabImage, this)),
+                  img_received_pub_(nodeHandler->advertise<std_msgs::Header>("/orb_slam2_cuda/received", 500))
+                  {std::cout<<"img grabber constructed"<<std::endl;}
 
         void GrabImage(const sensor_msgs::ImageConstPtr& msg);
 
         ros::Subscriber sub;
+        ros::Publisher img_received_pub_;
         ORB_SLAM2::System* mpSLAM;
         ORB_SLAM2::SlamData* mpSLAMDATA;
         ros::NodeHandle* nh;

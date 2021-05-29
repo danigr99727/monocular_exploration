@@ -1,5 +1,5 @@
 <launch>
-<arg name="odom_topic" value="/orb_slam2/odometry" />
+<arg name="odom_topic" value="/orb_slam2_cuda/odometry" />
 
     <arg name="vocabulary_path" default="$(find orb_slam2_cuda)/Vocabulary/ORBvoc.txt" />
     <arg name="camera_setting_path" default="$(find my_pipeline)/calibration/airsim.yaml" />
@@ -11,7 +11,7 @@
     	<param name="vocabulary_path" value="$(arg vocabulary_path)"/>
     	<param name="camera_setting_path" value="$(arg camera_setting_path)"/>
     	<remap from="/camera/image_raw" to="/airsim_node/drone_1/front_center_custom/Scene"/>
-    	<remap from="/odometry" to="$(arg odom_topic)"/>
+    	<!--<remap from="/odometry" to="$(arg odom_topic)"/>-->
     	<remap from="/transform" to="/orb_slam2/transform"/>
   	</node>
 
@@ -71,7 +71,7 @@
   <!-- main algorithm params -->
       <node name="rvizfiestavisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find my_pipeline)/cfg/flame.rviz" />
 
-  <include file="$(find exploration_manager)/launch/algorithm_no_groundtruths.xml">
+  <include file="$(find my_pipeline)/launch/algorithm_only_esdf.xml">
 
     <arg name="map_size_x_" value="$(arg map_size_x)"/>
     <arg name="map_size_y_" value="$(arg map_size_y)"/>
@@ -98,44 +98,8 @@
     <arg name="max_acc" value="0.5" />
   </include>
 
+  <node name="performance_meter" pkg="my_pipeline" type="performance_meter" output="screen"/>
+
   <node name="rvizesdfvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find my_pipeline)/cfg/airsim_groundtruth_esdf.rviz" />
-
-  <node pkg="waypoint_generator" name="waypoint_generator" type="waypoint_generator" output="screen">
-    <remap from="~odom" to="$(arg odom_topic)"/>
-    <remap from="~goal" to="/move_base_simple/goal"/>
-    <remap from="~traj_start_trigger" to="/traj_start_trigger" />
-    <param name="waypoint_type" value="point"/>
-  </node>
-
-  <node pkg="plan_manage" name="traj_server" type="traj_server" output="screen">
-    <remap from="/position_cmd" to="/planning/pos_cmd"/>
-
-    <remap from="/odom_world" to="$(arg odom_topic)"/>
-    <param name="traj_server/time_forward" value="1.5" type="double"/>
-    <param name="traj_server/pub_traj_id" value="4" type="int"/>
-
-    <param name="perception_utils/top_angle" value="0.56125" type="double"/>
-    <param name="perception_utils/left_angle" value="0.69222" type="double"/>
-    <param name="perception_utils/right_angle" value="0.68901" type="double"/>
-    <param name="perception_utils/max_dist" value="4.5" type="double"/>
-    <param name="perception_utils/vis_dist" value="1.0" type="double"/>
-
-  </node>
-
-  <node pkg="nodelet" type="nodelet" args="standalone airsim_controller/AirsimControllerNodelet" name="airsim_controller" required="true" output="screen">
-        <remap from="~odom" to="$(arg odom_topic)"/>
-        <remap from="~position_cmd" to="/planning/pos_cmd"/>
-        <remap from="~motors" to="motors"/>
-        <remap from="~takeoff" to="/airsim_node/drone_1/takeoff"/>
-        <remap from="~corrections" to="corrections"/>
-        <remap from="~so3_cmd" to="so3_cmd"/>
-        <rosparam file="$(find so3_control)/config/gains_hummingbird.yaml"/>
-        <rosparam file="$(find so3_control)/config/corrections_hummingbird.yaml"/>
-        <param name="mass" value="0.74"/>
-        <param name="use_angle_corrections " value="false"/>
-        <param name="use_external_yaw "      value="false"/>
-        <param name="gains/rot/z" value="1.0"/>
-        <param name="gains/ang/z" value="0.1"/>
-  </node>
 
 </launch>

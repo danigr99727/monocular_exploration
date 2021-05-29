@@ -20,25 +20,10 @@
 
 
 #include<iostream>
-#include<algorithm>
-#include<fstream>
-#include<chrono>
-
-#include<tf/transform_broadcaster.h>
-
 #include<ros/ros.h>
-#include <Converter.h>
-#include <cv_bridge/cv_bridge.h>
-
-#include<opencv2/core/core.hpp>
-
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
-
 #include <System.h>
 
 #include "orb_slam_wrapper.h"
-
-//using namespace std;
 
 
 int main(int argc, char **argv)
@@ -49,15 +34,14 @@ int main(int argc, char **argv)
 
     bool bUseViewer, bEnablePublishROSTopic;
     std::string voc_file, settings_file;
-    bUseViewer = false;
+    bUseViewer = true;
     bEnablePublishROSTopic = true;
 
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
 
-    ros::NodeHandle nh;
-
-    getParamOrFail(nh, "voc_file", &voc_file);
-    getParamOrFail(nh, "settings_file", &settings_file);
+    ros::NodeHandle nh("~");
+    getParamOrFail(nh, "camera_setting_path", &settings_file);
+    getParamOrFail(nh, "vocabulary_path", &voc_file);
     ORB_SLAM2::System SLAM(voc_file, settings_file,ORB_SLAM2::System::MONOCULAR, bUseViewer);
     ORB_SLAM2::SlamData SLAMDATA(&SLAM, &nh, bEnablePublishROSTopic);
     ORB_SLAM2::ImageGrabber igb(&SLAM, &SLAMDATA, &nh);

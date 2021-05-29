@@ -3,10 +3,11 @@
   <arg name="map_size_y_"/>
   <arg name="map_size_z_"/>
 
-  <arg name="sensor_pose_topic"/>
+ <arg name="odometry_topic"/>
+ <arg name="sensor_pose_topic"/>
   <arg name="depth_topic"/>
  <arg name="semantic_topic"/>
- <!-- <arg name="cloud_topic"/> -->
+ <arg name="cloud_topic"/>
 
   <arg name="cx"/>
   <arg name="cy"/>
@@ -16,26 +17,27 @@
   <arg name="max_vel"/>
   <arg name="max_acc"/>
 
-  <!-- main node -->
-  <node pkg="plan_env" name="test_sdf" type="test_sdf" output="screen" >
-    <remap from ="/map_ros/pose"   to = "$(arg sensor_pose_topic)"/>
+ <arg name="manager"/>
+ <!-- main node -->
+ <node pkg="nodelet" name="test_sdf" type="nodelet" output="screen" args="load exploration_manager/test_sdf_nodelet /$(arg manager)" >
+   <remap from ="/odom_world" to="$(arg odometry_topic)"/>
+   <remap from ="/map_ros/pose"   to = "$(arg sensor_pose_topic)"/>
     <remap from ="/map_ros/depth" to = "$(arg depth_topic)"/>
    <remap from ="/map_ros/semantics" to= "$(arg semantic_topic)"/>
-    <!--<remap from ="/map_ros/cloud" to="$(arg cloud_topic)"/> -->
+    <remap from ="/map_ros/cloud" to="$(arg cloud_topic)"/>
 
     <param name="sdf_map/resolution"      value="0.1" />
     <param name="sdf_map/map_size_x"   value="$(arg map_size_x_)" /> 
     <param name="sdf_map/map_size_y"   value="$(arg map_size_y_)" /> 
     <param name="sdf_map/map_size_z"   value="$(arg map_size_z_)" /> 
-    <param name="sdf_map/obstacles_inflation"     value="0.099" />
-    <param name="sdf_map/obstacles_inflation"     value="0.0" /> 
+    <param name="sdf_map/obstacles_inflation"     value="0.0" />
     <param name="sdf_map/local_bound_inflate"    value="0.5"/>
     <param name="sdf_map/local_map_margin" value="50"/>
     <param name="sdf_map/ground_height"        value="-1.0"/>
     <param name="sdf_map/default_dist"        value="0.0"/>
-   <param name="/map_ros/do_semantics"      value="false" type="bool" />
+  <param name="/map_ros/do_semantics"      value="false" type="bool" />
 
-   <param name="sdf_map/p_hit"  value="0.70"/>
+  <param name="sdf_map/p_hit"  value="0.70"/>
     <param name="sdf_map/p_miss" value="0.35"/>
     <param name="sdf_map/p_min"  value="0.12"/>
     <param name="sdf_map/p_max"  value="0.97"/>
@@ -45,12 +47,6 @@
     <param name="sdf_map/virtual_ceil_height"   value="-10"/>
     <param name="sdf_map/optimistic" value="false" type="bool"/>
     <param name="sdf_map/signed_dist" value="false" type="bool"/>
-    <param name="sdf_map/box_min_x" value="-10" type="double"/>
-    <param name="sdf_map/box_min_y" value="-6" type="double"/>
-    <param name="sdf_map/box_min_z" value="0" type="double"/>
-    <param name="sdf_map/box_max_x" value="10" type="double"/>
-    <param name="sdf_map/box_max_y" value="6" type="double"/>
-    <param name="sdf_map/box_max_z" value="2.0" type="double"/>
 
     <param name="map_ros/cx" value="$(arg cx)"/>
     <param name="map_ros/cy" value="$(arg cy)"/>
@@ -69,5 +65,6 @@
     <param name="map_ros/show_all_map" value="true"/>
     <param name="map_ros/frame_id"      value="world"/>
   </node>
+
 
 </launch>

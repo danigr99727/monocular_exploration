@@ -27,3 +27,6 @@ include_directories(
 
 link_libraries(
         ${catkin_LIBRARIES})
+
+add_executable(performance_meter src/performance_meter.cpp)
+target_link_libraries(performance_meter  ${catkin_LIBRARIES})

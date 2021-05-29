@@ -80,8 +80,8 @@ target_link_libraries(Mono
 ${LIBS}
 )
 
-add_library(orb_slam_nodelet src/orb_slam_mono_nodelet.cc)
-target_link_libraries(orb_slam_nodelet  ${catkin_LIBRARIES})
+add_library(orb_slam_nodelet src/orb_slam_mono_nodelet.cc lib/orb_slam_wrapper.cc)
+target_link_libraries(orb_slam_nodelet  ${LIBS})
 
 # Node for stereo camera
 #add_executable(Stereo
