@@ -3,7 +3,7 @@
 
 <!-- AirSim ROS Wrapper -->
 	<include file="$(find airsim_ros_pkgs)/launch/airsim_node.launch">
-		<arg name="output" value="screen"/>
+		<arg name="output" value="log"/>
 		<arg name="host" value="129.31.139.24"/>
 	</include>
 <!-- Vehicle Dynamic Constraints -->
@@ -12,8 +12,8 @@
 	<!--<include file="$(find airsim_ros_pkgs)/launch/position_controller_simple.launch"/>-->
 -->
 
-  <arg name="map_size_x" value="20.0"/>
-  <arg name="map_size_y" value="20.0"/>
+  <arg name="map_size_x" value="60.0"/>
+  <arg name="map_size_y" value="60.0"/>
   <arg name="map_size_z" value="5.0"/>
 
   <!-- topic of your odometry such as VIO or LIO -->

@@ -1,14 +1,13 @@
 #include <ros/ros.h>
 #include <std_msgs/Header.h>
 #include <std_msgs/Float64.h>
-#include <std_msgs/Float64MultiArray.h>
 #include <std_msgs/UInt8.h>
 #include <map>
 #include <message_filters/subscriber.h>
 
 struct Measurements{
     Measurements()=default;
-    double timestamps[7];
+    double timestamps[9];
     int count;
 };
 
@@ -23,8 +22,10 @@ public:
         stamp_subs_[4] = std::unique_ptr<message_filters::Subscriber<std_msgs::Header>>(new message_filters::Subscriber<std_msgs::Header>(nh, "/flame/sent", 500));
         stamp_subs_[5] = std::unique_ptr<message_filters::Subscriber<std_msgs::Header>>(new message_filters::Subscriber<std_msgs::Header>(nh, "/sdf_map/received", 500));
         stamp_subs_[6] = std::unique_ptr<message_filters::Subscriber<std_msgs::Header>>(new message_filters::Subscriber<std_msgs::Header>(nh, "/sdf_map/sent", 500));
+        stamp_subs_[7] = std::unique_ptr<message_filters::Subscriber<std_msgs::Header>>(new message_filters::Subscriber<std_msgs::Header>(nh, "/tdnet/received", 500));
+        stamp_subs_[8] = std::unique_ptr<message_filters::Subscriber<std_msgs::Header>>(new message_filters::Subscriber<std_msgs::Header>(nh, "/tdnet/sent", 500));
 
-        ROS_INFO("seq_number, airsim_sent, slam_received, slam_sent, flame_received, flame_sent, sdf_map_received, sdf_map_sent");
+        ROS_INFO("seq_number, airsim_sent, slam_received, slam_sent, flame_received, flame_sent, sdf_map_received, sdf_map_sent, tdnet_received, tdnet_sent");
 
         stamp_subs_[0]->registerCallback([this](const std_msgs::HeaderConstPtr& headerPtr){
             //std::cout<<"airsim_received"<<headerPtr->stamp<<std::endl;
@@ -32,24 +33,27 @@ public:
             stamp_callback(headerPtr->stamp.toSec(), 0);
         });
 
-        for(int i=1; i<7; i++){
+        for(int i=1; i<9; i++){
             stamp_subs_[i]->registerCallback([i, this](const std_msgs::HeaderConstPtr& headerPtr){
                 //std::cout<<i<<"received"<<headerPtr->stamp<<std::endl;
                 stamp_callback(headerPtr->stamp.toSec(), i);
             });
         }
 
-        latency_pub_[0]=nh.advertise<std_msgs::Float64>("airsim_slam_latency", 10);
-        latency_pub_[1]=nh.advertise<std_msgs::Float64>("slam_latency", 10);
-        latency_pub_[2]=nh.advertise<std_msgs::Float64>("slam_flame_latency", 10);
-        latency_pub_[3]=nh.advertise<std_msgs::Float64>("flame_latency", 10);
-        latency_pub_[4]=nh.advertise<std_msgs::Float64>("flame_sdf_map_latency", 10);
-        latency_pub_[5]=nh.advertise<std_msgs::Float64>("sdf_map_latency", 10);
+        latency_pub_[0]=nh.advertise<std_msgs::Float64>("/airsim_slam_latency", 10);
+        latency_pub_[1]=nh.advertise<std_msgs::Float64>("/slam_latency", 10);
+        latency_pub_[2]=nh.advertise<std_msgs::Float64>("/slam_flame_latency", 10);
+        latency_pub_[3]=nh.advertise<std_msgs::Float64>("/flame_latency", 10);
+        latency_pub_[4]=nh.advertise<std_msgs::Float64>("/flame_sdf_map_latency", 10);
+        latency_pub_[5]=nh.advertise<std_msgs::Float64>("/sdf_map_latency", 10);
+        latency_pub_[6]=nh.advertise<std_msgs::Float64>("/airsim_tdnet_latency", 10);
+        latency_pub_[7]=nh.advertise<std_msgs::Float64>("/tdnet_sdf_map_latency", 10);
 
-        fps_pub_[0]=nh.advertise<std_msgs::UInt8>("airsim_fps", 10);
-        fps_pub_[1]=nh.advertise<std_msgs::UInt8>("slam_fps", 10);
-        fps_pub_[2]=nh.advertise<std_msgs::UInt8>("flame_fps", 10);
-        fps_pub_[3]=nh.advertise<std_msgs::UInt8>("sdf_map_fps", 10);
+        fps_pub_[0]=nh.advertise<std_msgs::UInt8>("/airsim_fps", 10);
+        fps_pub_[1]=nh.advertise<std_msgs::UInt8>("/slam_fps", 10);
+        fps_pub_[2]=nh.advertise<std_msgs::UInt8>("/flame_fps", 10);
+        fps_pub_[3]=nh.advertise<std_msgs::UInt8>("/sdf_map_fps", 10);
+        fps_pub_[4]=nh.advertise<std_msgs::Float64>("/tdnet_fps", 10);
     }
 
     ~PerformanceMeter() = default;
@@ -69,15 +73,11 @@ private:
             msg.data=static_cast<uint8_t>(fps_utils_[index>>1].size());
             fps_pub_[index>>1].publish(msg);
         }
-        /*if(index>0){
-            std_msgs::Float64 msg;
-            msg.data = (measurement.timestamps[index]-measurement.timestamps[index-1])*1000.0f;
-            latency_pub_[index-1].publish(msg);
-        }*/
+
         measurement.count++;
 
-        if (measurement.count==7){
-            ROS_INFO("%f, %f, %f, %f, %f, %f, %f, %f",
+        if (measurement.timestamps[6] != 0){
+            ROS_INFO("%f, %f, %f, %f, %f, %f, %f, %f, %f, %f",
                      stamp,
                      measurement.timestamps[0],
                      measurement.timestamps[1],
@@ -85,9 +85,11 @@ private:
                      measurement.timestamps[3],
                      measurement.timestamps[4],
                      measurement.timestamps[5],
-                     measurement.timestamps[6]);
-            std_msgs::Float64 msgs[6];
-            for(int i=0; i<6; i++){
+                     measurement.timestamps[6],
+                     measurement.timestamps[7],
+                     measurement.timestamps[8]);
+            std_msgs::Float64 msgs[8];
+            for(int i=0; i<8; i++){
                     msgs[i].data = (measurement.timestamps[i+1]-measurement.timestamps[i])*1000.0f;
                     latency_pub_[i].publish(msgs[i]);
             }
@@ -95,25 +97,18 @@ private:
         }
     }
     //ros::NodeHandle& nh_;
-    std::unique_ptr<message_filters::Subscriber<std_msgs::Header>> stamp_subs_[7];
-
+    std::unique_ptr<message_filters::Subscriber<std_msgs::Header>> stamp_subs_[9];
     std::map<double, Measurements> measurements_map_;
-
-    ros::Publisher latency_pub_[6];
-    ros::Publisher fps_pub_[4];
-
-    std::vector<double> fps_utils_[4];
-
+    ros::Publisher latency_pub_[8];
+    ros::Publisher fps_pub_[5];
+    std::vector<double> fps_utils_[5];
 };
 
 int main(int argc, char** argv){
     ros::init(argc, argv, "exploration_node");
     ros::NodeHandle nh("~");
-
     PerformanceMeter performanceMeter(nh);
-
     ros::Duration(1.0).sleep();
     ros::spin();
-
     return 0;
 }
