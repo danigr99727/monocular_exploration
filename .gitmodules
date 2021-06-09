@@ -26,3 +26,6 @@
 [submodule "src/graph_rviz_plugin"]
 	path = src/graph_rviz_plugin
 	url = https://gitlab.com/InstitutMaupertuis/graph_rviz_plugin
+[submodule "src/gscam"]
+	path = src/gscam
+	url = https://github.com/ros-drivers/gscam

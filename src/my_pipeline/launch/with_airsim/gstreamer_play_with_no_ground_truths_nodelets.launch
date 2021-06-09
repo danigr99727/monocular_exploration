@@ -2,12 +2,11 @@
 <arg name="odom_topic" value="/orb_slam2_cuda/odometry" />
 
     <arg name="vocabulary_path" default="$(find orb_slam2_cuda)/Vocabulary/ORBvoc.txt" />
-    <arg name="camera_setting_path" default="$(find my_pipeline)/calibration/airsim.yaml" />
+    <arg name="camera_setting_path" default="$(find my_pipeline)/calibration/s20_wide.yaml" />
     <arg name="bUseViewer" default="true" />
     <arg name="bEnablePublishROSTopic" default="true" />
 
     <arg name="manager" default="manager" />
-    <arg name="standalone" default="true" />
     <arg name="output_dest" default="screen" />
     <arg name="load_params" default="true" />
     <arg name="param_file" default="flame_nodelet_airsim.yaml" />
@@ -28,15 +27,33 @@
                args="0.0 0.0 0.0 0.5 -0.5 0.5 -0.5 $(arg world_frame_id) $(arg camera_world_frame_id)" >
           </node>
         <!-- Launch the nodelet manager. -->
-        <node if="$(arg standalone)"
+        <node
               pkg="nodelet" type="nodelet" name="$(arg manager)"
               args="manager" output="$(arg output_dest)" >
+        </node>
+
+        <node pkg="nodelet" type="nodelet"
+            name="GSCamNodelet"
+            args="load gscam/GSCamNodelet standalone_nodelet"
+            output="screen">
+            <param name="camera_name" value="default"/>
+            <param name="camera_info_url" value="package://gscam/examples/uncalibrated_parameters.ini"/>
+            <param name="gscam_config" value=value="rtspsrc location=rtsp://192.168.1.99:5554/playlist.m3u latency=100  ! typefind ! rtph264depay ! h264parse ! avdec_h264 ! videoconvert"/>
+            <param name="frame_id" value="/v4l_frame"/>
+            <param name="sync_sink" value="true"/>
+          </node>
+
+        <node pkg="nodelet" type="nodelet" name="rectify_color"
+              args="load image_proc/rectify $(arg manager) $(arg bond)"
+      	respawn="$(arg respawn)">
+          <remap from="image_mono" to="image_color" />
+          <remap from="image_rect" to="image_rect_color" />
         </node>
 
       <node name="orb_slam2_cuda" pkg="nodelet" type="nodelet" output="screen" args="load orb_slam2_cuda/ORBSLAMNodelet /$(arg manager)">
     	    <param name="vocabulary_path" value="$(arg vocabulary_path)"/>
     	    <param name="camera_setting_path" value="$(arg camera_setting_path)"/>
-            <remap from="/camera/image_raw" to="/airsim_node/drone_1/front_center_custom/Scene"/>
+            <remap from="/camera/image_raw" to="/$(arg cam_name)/image_rect"/>
             <remap from="/transform" to="/orb_slam2/transform"/>
         </node>
 
@@ -45,8 +62,8 @@
               args="load flame_ros/FlameNodelet /$(arg manager)"
               output="$(arg output_dest)" >
           <rosparam command="load" if="$(arg load_params)" file="$(find my_pipeline)/cfg/$(arg param_file)"/>
-          <remap from="/image" to="/airsim_node/drone_1/front_center_custom/Scene" />
-         <remap from="/info" to="/airsim_node/drone_1/front_center_custom/Scene/camera_info" />
+          <remap from="/image" to="/$(arg cam_name)/image_rect" />
+         <remap from="/info" to="/$(arg cam_name)/camera_info" />
           <remap from="/transform" to="/orb_slam2/transform"/>
           <remap from="keyframes" to="keyframes" />
         </node>
@@ -69,22 +86,11 @@
             <arg name="cloud_topic" value="/none"/>
 
             <!-- intrinsic params of the depth camera -->
-            <arg name="cx" value="320.0"/>
-            <arg name="cy" value="240.0"/>
-            <arg name="fx" value="224.066203125"/>
-            <arg name="fy" value="224.066203125"/>
+            <arg name="cx" value="322.47248"/>
+            <arg name="cy" value="247.22683"/>
+            <arg name="fx" value="255.47336"/>
+            <arg name="fy" value="257.20206"/>
           </include>
-
-          <!-- AirSim ROS Wrapper -->
-
-          <include file="$(find airsim_ros_pkgs)/launch/airsim_nodelet.launch">
-          		<arg name="output" value="screen"/>
-          		<arg name="manager" value="manager"/>
-          		<arg name="host" value="129.31.139.24"/>
-          	</include>
-
-          <!-- Vehicle Dynamic Constraints -->
-          	<include file="$(find airsim_ros_pkgs)/launch/dynamic_constraints.launch"/>
 
 
   <node name="performance_meter" pkg="my_pipeline" type="performance_meter" output="screen"/>

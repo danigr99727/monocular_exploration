@@ -14,9 +14,6 @@
   <arg name="fx"/>
   <arg name="fy"/>
 
-  <arg name="max_vel"/>
-  <arg name="max_acc"/>
-
   <!-- main node -->
   <node pkg="plan_env" name="test_sdf" type="test_sdf" output="screen" >
    <remap from ="/odom_world" to="$(arg odometry_topic)"/>

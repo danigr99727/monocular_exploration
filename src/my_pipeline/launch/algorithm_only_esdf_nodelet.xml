@@ -14,9 +14,6 @@
   <arg name="fx"/>
   <arg name="fy"/>
 
-  <arg name="max_vel"/>
-  <arg name="max_acc"/>
-
  <arg name="manager"/>
  <!-- main node -->
  <node pkg="nodelet" name="test_sdf" type="nodelet" output="screen" args="load exploration_manager/test_sdf_nodelet /$(arg manager)" >

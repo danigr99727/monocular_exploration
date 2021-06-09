@@ -13,9 +13,6 @@
   <arg name="fx"/>
   <arg name="fy"/>
 
-  <arg name="max_vel"/>
-  <arg name="max_acc"/>
-
   <!-- main node -->
   <node pkg="plan_env" name="test_sdf" type="test_sdf" output="screen" >
     <remap from ="/map_ros/pose"   to = "$(arg sensor_pose_topic)"/>
