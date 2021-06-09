@@ -6,10 +6,6 @@
 # Camera Model #
 #==============#
 
-#Camera.name: "s20 wide monocular"
-#Camera.setup: "monocular"
-#Camera.model: "perspective"
-
 #camera_matrix from ros calibration
 
 Camera.fx: 255.47336
@@ -17,17 +13,17 @@ Camera.fy: 257.20206
 Camera.cx: 322.47248
 Camera.cy: 247.22683
 
-Camera.k1: 0.000
-Camera.k2: 0.000
-Camera.p1: 0.000
-Camera.p2: 0.000
-Camera.k3: 0.000
+Camera.k1: 0
+Camera.k2: 0
+Camera.p1: 0
+Camera.p2: 0
+Camera.k3: 0
 
 Camera.fps: 30.0
 #Camera.cols: 640
 #Camera.rows: 480
 
-Camera.RGB: 1
+Camera.RGB: 0
 
 #================#
 # ORB Parameters #
@@ -65,7 +61,7 @@ ORBextractor.minThFAST: 7
 Viewer.KeyFrameSize: 0.05
 Viewer.KeyFrameLineWidth: 1
 Viewer.GraphLineWidth: 0.9
-Viewer.PointSize:2
+Viewer.PointSize: 2
 Viewer.CameraSize: 0.08
 Viewer.CameraLineWidth: 3
 Viewer.ViewpointX: 0
