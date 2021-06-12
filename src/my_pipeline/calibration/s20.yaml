@@ -1,59 +1,68 @@
-# s20 monocular model
+%YAML:1.0
+
+  # s20 monocular model
 
 #==============#
 # Camera Model #
 #==============#
 
-Camera.name: "s20 monocular"
-Camera.setup: "monocular"
-Camera.model: "perspective"
-
 #camera_matrix from ros calibration
 
-Camera.fx: 492.01804
-Camera.fy: 494.94574
-Camera.cx: 322.02264
-Camera.cy: 235.62916
+Camera.fx: 497.24344
+Camera.fy: 497.48286
+Camera.cx: 333.3461
+Camera.cy: 251.44796
 
-Camera.k1: 0.000
-Camera.k2: 0.000
-Camera.p1: 0.000
-Camera.p2: 0.000
-Camera.k3: 0.000
+Camera.k1: 0
+Camera.k2: 0
+Camera.p1: 0
+Camera.p2: 0
+Camera.k3: 0
 
 Camera.fps: 30.0
-Camera.cols: 640
-Camera.rows: 480
 
-Camera.color_order: "RGB"
+Camera.RGB: 0
 
 #================#
 # ORB Parameters #
 #================#
 
-Feature.max_num_keypoints: 1000
-Feature.scale_factor: 1.2
-Feature.num_levels: 8
-Feature.ini_fast_threshold: 20
-Feature.min_fast_threshold: 7
+#--------------------------------------------------------------------------------------------
+# ORB Parameters
+#--------------------------------------------------------------------------------------------
+
+# ORB Extractor: Number of features per image
+ORBextractor.nFeatures: 1000
+
+# ORB Extractor: Scale factor between levels in the scale pyramid
+ORBextractor.scaleFactor: 1.2
+
+# ORB Extractor: Number of levels in the scale pyramid
+ORBextractor.nLevels: 8
+
+# ORB Extractor: Fast threshold
+# Image is divided in a grid. At each cell FAST are extracted imposing a minimum response.
+# Firstly we impose iniThFAST. If no corners are detected we impose a lower value minThFAST
+# You can lower these values if your images have low contrast
+ORBextractor.iniThFAST: 20
+ORBextractor.minThFAST: 7
 
 #=====================#
 # Tracking Parameters #
 #=====================#
 
-depth_threshold: 35
+#depth_threshold: 35
 
-#===========================#
-# PangolinViewer Parameters #
-#===========================#
-
-PangolinViewer.keyframe_size: 0.07
-PangolinViewer.keyframe_line_width: 1
-PangolinViewer.graph_line_width: 1
-PangolinViewer.point_size: 2
-PangolinViewer.camera_size: 0.08
-PangolinViewer.camera_line_width: 3
-PangolinViewer.viewpoint_x: 0
-PangolinViewer.viewpoint_y: -0.65
-PangolinViewer.viewpoint_z: -1.9
-PangolinViewer.viewpoint_f: 400
+#--------------------------------------------------------------------------------------------
+# Viewer Parameters
+#--------------------------------------------------------------------------------------------
+Viewer.KeyFrameSize: 0.05
+Viewer.KeyFrameLineWidth: 1
+Viewer.GraphLineWidth: 0.9
+Viewer.PointSize: 2
+Viewer.CameraSize: 0.08
+Viewer.CameraLineWidth: 3
+Viewer.ViewpointX: 0
+Viewer.ViewpointY: -0.7
+Viewer.ViewpointZ: -1.8
+Viewer.ViewpointF: 5

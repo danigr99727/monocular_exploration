@@ -1,11 +1,12 @@
 <launch>
 
     <!-- Set this to your camera's name -->
-    <arg name="cam_name" value="s20cam_wide" />
+    <arg name="cam_name" value="s20cam" />
 
 
     <!-- Start the GSCAM node -->
-    <env name="GSCAM_CONFIG" value="rtspsrc location=rtsp://192.168.1.99:5554/playlist.m3u latency=100  ! typefind ! rtph264depay ! h264parse ! avdec_h264 ! videoconvert" />
+    <env name="GSCAM_CONFIG" value="rtspsrc location=rtsp://146.169.143.115:5554/playlist.m3u latency=100  ! typefind ! rtph264depay ! h264parse ! avdec_h264 ! videoconvert"/>
+    <!-- latency=50  ! rtph264depay ! nvv4l2decoder ! nvvideoconvert ! nveglglessink sync=false ! nvvideoconvert ! videoconvert" /> -->
     <node pkg="gscam" type="gscam" name="$(arg cam_name)">
         <param name="camera_name" value="$(arg cam_name)" />
         <param name="camera_info_url" value="package://my_pipeline/calibration/ost_wide.yaml" />
@@ -13,9 +14,6 @@
         <remap from="camera/image_raw" to="/$(arg cam_name)/image_raw" />
     </node>
 
-  <!-- Provide rectification -->
-  <node pkg="image_proc" type="image_proc" name="creative_image_proc"
-        ns="$(arg cam_name)" />
 
 
 </launch>

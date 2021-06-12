@@ -1,17 +1,17 @@
 image_width: 640
 image_height: 480
-camera_name: s20cam
+camera_name: s20cam_wide
 camera_matrix:
   rows: 3
   cols: 3
-  data: [492.01804,   0.     , 322.02264,
-           0.     , 494.94574, 235.62916,
+  data: [497.24344,   0.     , 333.3461 ,
+           0.     , 497.48286, 251.44796,
            0.     ,   0.     ,   1.     ]
 camera_model: plumb_bob
 distortion_coefficients:
   rows: 1
   cols: 5
-  data: [0.044649, -0.043682, -0.000765, 0.000443, 0.000000]
+  data: [0.102959, -0.061169, 0.010688, 0.008098, 0.000000]
 rectification_matrix:
   rows: 3
   cols: 3
@@ -21,6 +21,6 @@ rectification_matrix:
 projection_matrix:
   rows: 3
   cols: 4
-  data: [497.87506,   0.     , 322.32391,   0.     ,
-           0.     , 500.71997, 235.29171,   0.     ,
+  data: [520.21637,   0.     , 338.17015,   0.     ,
+           0.     , 520.20496, 256.35303,   0.     ,
            0.     ,   0.     ,   1.     ,   0.     ]
