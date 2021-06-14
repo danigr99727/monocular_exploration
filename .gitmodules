@@ -22,10 +22,6 @@
 	path = third_party/ORB_SLAM2_CUDA
 	url = https://github.com/danigr99727/ORB_SLAM2_CUDA
 
-[submodule "src/graph_rviz_plugin"]
-	path = src/graph_rviz_plugin
-	url = https://gitlab.com/InstitutMaupertuis/graph_rviz_plugin
-
 [submodule "src/gscam"]
 	path = src/gscam
 	url = https://github.com/ros-drivers/gscam
