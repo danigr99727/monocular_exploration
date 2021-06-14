@@ -36,3 +36,6 @@
 [submodule "third_party/opencv"]
 	path = third_party/opencv
 	url = https://github.com/opencv/opencv
+[submodule "src/graph_rviz_plugin"]
+	path = src/graph_rviz_plugin
+	url = https://gitlab.com/InstitutMaupertuis/graph_rviz_plugin
