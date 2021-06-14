@@ -67,9 +67,9 @@ threading:
 features:
   do_letterbox: False # Process only middle third of image.
   detection:
-    min_grad_mag: 4.0 # Minimum gradient magntiude.
+    min_grad_mag: 5.0 # Minimum gradient magntiude.
     min_error: 100 # Minimum photo error.
-    win_size: 9 # Detection grid resolution (win_size x win_size).
+    win_size: 16 # Detection grid resolution (win_size x win_size).
   tracking:
     win_size: 5 # Feature tracking window size. If not using LK, must be odd.
     max_dropouts: 5 # Max number of missed detections before feature is killed.

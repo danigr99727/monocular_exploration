@@ -74,7 +74,7 @@ private:
 
         measurement.count++;
 
-        if (measurement.timestamps[6] != 0 && measurement.count==7){
+        if (measurement.timestamps[6] != 0 && measurement.count==9){
             std_msgs::Float64 msgs[5];
             for(int i=0; i<4; i++){
                 if(measurement.timestamps[i*2+2]!=0 && measurement.timestamps[i*2+1]!=0) {
