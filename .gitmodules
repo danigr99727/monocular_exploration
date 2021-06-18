@@ -16,7 +16,7 @@
 
 [submodule "third_party/flame"]
 	path = third_party/flame
-	url = https://github.com/robustrobotics/flame
+	url = https://github.com/danigr99727/flame
 
 [submodule "third_party/ORB_SLAM2_CUDA"]
 	path = third_party/ORB_SLAM2_CUDA
@@ -39,3 +39,9 @@
 [submodule "src/graph_rviz_plugin"]
 	path = src/graph_rviz_plugin
 	url = https://gitlab.com/InstitutMaupertuis/graph_rviz_plugin
+[submodule "third_party/Pangolin"]
+	path = third_party/Pangolin
+	url = https://github.com/stevenlovegrove/Pangolin
+[submodule "third_party/cuda-samples"]
+	path = third_party/cuda-samples
+	url = https://github.com/NVIDIA/cuda-samples
