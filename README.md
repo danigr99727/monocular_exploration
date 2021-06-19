@@ -9,7 +9,9 @@ The following setup has been successfully tested for these instructions:
 - ROS Melodic (used full-desktop installation)
 
 ## clone repo
+```console
 git clone --recurse-submodules https://github.com/danigr99727/monocular_exploration
+```
 
 ## Update and install compilers
 ```console
