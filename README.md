@@ -13,10 +13,10 @@ Markup : * Ubuntu 18.04
 sudo apt update
 sudo apt upgrade
 apt-get install -y gcc-6 g++-6  gcc-7 g++-7 gcc-8 g++-8
-```
+```console
 
 ## gstreamer
-```
+```console
 sudo apt install -y build-essential git
 sudo apt install -y \
 libssl1.0.0 \
@@ -30,7 +30,7 @@ libgstrtspserver-1.0-0 \
 libjansson4
 ```
 ## opencv
-```
+```console
 sudo apt install -y cmake pkg-config unzip yasm git checkinstall
 sudo apt install -y libjpeg-dev libpng-dev libtiff-dev
 sudo apt install -y libavcodec-dev libavformat-dev libswscale-dev libavresample-dev
@@ -91,14 +91,14 @@ make -j6
 sudo make install
 ```
 ## AIRSIM
-```
+```console
 cd ../../AirSim
 ./setup.sh
 ./build.sh
 ```
 
 ## Pangolin
-```
+```console
 cd ../Pangolin
 sudo apt install -y libgl1-mesa-dev
 sudo apt install -y libglew-dev
@@ -114,7 +114,7 @@ sudo cmake --install .
 ```
 
 ## ORB-SLAM2-CUDA
-```
+```console
 cd ../../ORB_SLAM2_CUDA
 sudo apt-get install -y libblas-dev
 sudo apt-get install -y liblapack-dev
@@ -124,7 +124,7 @@ sudo apt-get install -y python-vtk
 ```
 
 ## FLAME
-```
+```console
 cd ../flame
 sudo apt-get install -y libboost-all-dev libpcl-dev python-catkin-tools
 # Create a dependencies folder.
@@ -148,7 +148,7 @@ make install
 ```
 
 ## TDNET ENV
-```
+```console
 cd ../../../
 sudo apt-get install -y python3.7
 sudo apt-get install -y python3.7-venv
@@ -160,16 +160,20 @@ sudo apt-get install -y python-catkin-tools python3.7-dev python3-numpy
 sudo pip3.7 install -r requirements.txt
 ```
 ## AirSim ROS
-```
+```console
 cd third_party/AirSim/ros
 sudo apt-get install -y ros-melodic-tf2-sensor-msgs ros-melodic-tf2-geometry-msgs ros-melodic-mavros*
 catkin build -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8
 source ./devel/setup.bash
 ```
 ## FUEL dependencies
+```console
 cd ../../../
 sudo apt-get install -y libdw-dev
 sudo apt-get -y install libarmadillo-dev ros-melodic-nlopt
+```
 
 ## Build catkin packages
-./catkin_make_python3
+```console
+./catkin_make_python3.sh
+```
