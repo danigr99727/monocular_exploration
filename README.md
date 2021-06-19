@@ -4,9 +4,9 @@ For more infromation, see FYP_Final_Report.pdf
 
 # How to build:
 The following setup has been successfully tested for these instructions: 
-Markup : * Ubuntu 18.04
-         * CUDA 10.1
-         * ROS Melodic (used full-desktop installation)
+- Ubuntu 18.04
+- CUDA 10.1
+- ROS Melodic (used full-desktop installation)
 
 ## Update and install compilers
 ```console
