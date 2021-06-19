@@ -8,6 +8,9 @@ The following setup has been successfully tested for these instructions:
 - CUDA 10.1
 - ROS Melodic (used full-desktop installation)
 
+## clone repo
+git clone --recurse-submodules https://github.com/danigr99727/monocular_exploration
+
 ## Update and install compilers
 ```console
 sudo apt update
@@ -56,7 +59,6 @@ export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
 source /usr/local/bin/virtualenvwrapper.sh
 mkvirtualenv cv -p python3
 pip3 install numpy
-git clone --recurse-submodules https://github.com/danigr99727/monocular_exploration
 
 echo "Procced with the installation"
 cd monocular_exploration/third_party/opencv
