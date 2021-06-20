@@ -83,7 +83,7 @@
           <remap from="image_rect" to="/$(arg cam_name)/image_rect" />
         </node>
 
-        <include file="$(find my_pipeline)/launch/algorithm_only_esdf_nodelet.xml">
+        <include file="$(find exploration_manager)/launch/algorithm_only_esdf_nodelet.xml">
             <arg name="manager" value="$(arg manager)"/>
 
             <arg name="map_size_x_" value="$(arg map_size_x)"/>
@@ -112,8 +112,8 @@
 
   <node name="rvizesdfvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find my_pipeline)/cfg/airsim_groundtruth_esdf.rviz" />
 
-<node name="segmentator" pkg="tdnet_nyud" type="segmentation.py" output="screen">
+<!--<node name="segmentator" pkg="tdnet_nyud" type="segmentation.py" output="screen">
    <remap from="image_raw" to="/$(arg cam_name)/image_raw" />
-</node>
+</node>-->
 
 </launch>

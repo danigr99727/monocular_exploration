@@ -79,7 +79,7 @@
   <!-- main algorithm params -->
     <!--  <node name="rvizfiestavisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find my_pipeline)/cfg/flame.rviz" />-->
 
-  <include file="$(find my_pipeline)/launch/algorithm_only_esdf.xml">
+  <include file="$(find exploration_manager)/launch/algorithm_only_esdf.xml">
 
     <arg name="map_size_x_" value="$(arg map_size_x)"/>
     <arg name="map_size_y_" value="$(arg map_size_y)"/>
