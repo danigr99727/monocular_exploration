@@ -96,6 +96,7 @@ sudo make install
 ```
 ## AIRSIM
 ```console
+cp ./AirSim-settings.json ~/Documents/AirSim/settings.json
 cd ../../AirSim
 ./setup.sh
 ./build.sh
