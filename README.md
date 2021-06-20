@@ -125,6 +125,8 @@ sudo apt-get install -y liblapack-dev
 sudo apt-get install -y libopenni2-dev
 sudo apt-get install -y python-vtk
 ./build.sh
+mkdir ../../src/orb_slam2_cuda/Vocabulary
+mv ./Vocabulary/ORBvoc.txt ../../src/orb_slam2_cuda/Vocabulary/ORBvoc.txt
 ```
 
 ## FLAME
@@ -163,9 +165,18 @@ sudo apt-get install -y python3-yaml
 sudo apt-get install -y python-catkin-tools python3.7-dev python3-numpy
 sudo pip3.7 install -r requirements.txt
 ```
+## Download TDNET pretrained weights
+```console
+cd ./src/tdnet_nyud
+mkdir checkpoint
+cd checkpoint
+pip install gdown
+gdown https://drive.google.com/uc?id=1QEIzVp3faftomms_vReF0ReqmiDKr7Ys
+```
+
 ## AirSim ROS
 ```console
-cd third_party/AirSim/ros
+cd ../../third_party/AirSim/ros
 sudo apt-get install -y ros-melodic-tf2-sensor-msgs ros-melodic-tf2-geometry-msgs ros-melodic-mavros*
 catkin build -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8
 source ./devel/setup.bash
