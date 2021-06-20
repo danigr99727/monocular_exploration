@@ -18,7 +18,7 @@ git clone --recurse-submodules https://github.com/danigr99727/monocular_explorat
 sudo apt update
 sudo apt upgrade
 apt-get install -y gcc-6 g++-6  gcc-7 g++-7 gcc-8 g++-8
-```console
+```
 
 ## gstreamer
 ```console
